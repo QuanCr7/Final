@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BookStore - Giới thiệu</title>
+    <link rel="stylesheet" href="/css/headandfoot.css">
+    <link rel="stylesheet" href="/css/shopping.css">
+    <link rel="stylesheet" href="/css/about.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/school.png">
+</head>
+<body>
+<!-- Header -->
+<header class="main-header">
+    <div class="container">
+        <div class="header-content">
+            <div class="logo-container">
+                <a href="/" class="logo">
+                    <i class="fas fa-book-open logo-icon"></i>
+                    <span class="logo-text">BookStore</span>
+                </a>
+            </div>
+
+            <nav class="main-nav">
+                <ul class="nav-list">
+                    <li class="nav-item"><a href="/" class="nav-link"><i class="fas fa-home"></i> Trang chủ</a></li>
+                    <li class="nav-item"><a href="/search" class="nav-link"><i class="fas fa-search"></i> Tìm kiếm</a></li>
+                    <li class="nav-item">
+                        <span class="nav-link"><i class="fas fa-tags"></i> Thể loại</span>
+                        <div class="categories-dropdown">
+                            <div class="categories-container">
+                                <!-- Nội dung sẽ được thêm bằng JavaScript -->
+                            </div>
+                        </div>
+                    </li>
+                    <li class="nav-item"><a href="/about" class="nav-link active"><i class="fas fa-info-circle"></i> Giới thiệu</a></li>
+                </ul>
+            </nav>
+
+            <div class="auth-section">
+                <a href="/auth/login" class="auth-btn login-btn"><i class="fas fa-sign-in-alt"></i> Đăng nhập</a>
+                <a href="/auth/register" class="auth-btn register-btn"><i class="fas fa-user-plus"></i> Đăng ký</a>
+            </div>
+
+            <button class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </div>
+</header>
+
+<!-- Main Content -->
+<main class="main-content">
+    <!-- Hero Section -->
+    <section class="about-hero">
+        <div class="container">
+            <h1>Giới thiệu về BookStore</h1>
+            <p>Khám phá thế giới sách đa dạng và phong phú tại BookStore - điểm đến lý tưởng cho những người yêu sách</p>
+        </div>
+    </section>
+
+    <div class="container">
+        <!-- About Section -->
+        <section class="about-section">
+            <h2 class="section-title">Về chúng tôi</h2>
+            <div class="about-content">
+                <p>BookStore được thành lập với sứ mệnh mang tri thức đến với mọi người. Chúng tôi tin rằng sách không chỉ là nguồn tri thức vô tận mà còn là người bạn đồng hành đáng tin cậy trong cuộc sống.</p>
+                <p>Với hơn 5 năm kinh nghiệm trong ngành sách, chúng tôi tự hào là một trong những nhà cung cấp sách trực tuyến hàng đầu Việt Nam, với kho sách đồ sộ lên đến hơn 50.000 đầu sách thuộc nhiều thể loại khác nhau.</p>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-container">
+                <div class="stat-item">
+                    <div class="stat-number">50,000+</div>
+                    <div class="stat-text">Đầu sách</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">100,000+</div>
+                    <div class="stat-text">Khách hàng</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">5+</div>
+                    <div class="stat-text">Năm kinh nghiệm</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">63</div>
+                    <div class="stat-text">Tỉnh thành phục vụ</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="about-section">
+            <h2 class="section-title">Tại sao chọn BookStore?</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <h3 class="feature-title">Đa dạng thể loại</h3>
+                    <p>Với hơn 50 thể loại sách khác nhau từ văn học, kinh tế, khoa học đến sách thiếu nhi, chúng tôi đáp ứng mọi nhu cầu đọc sách của bạn.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shipping-fast"></i>
+                    </div>
+                    <h3 class="feature-title">Giao hàng nhanh chóng</h3>
+                    <p>Dịch vụ giao hàng tận nơi trên toàn quốc với thời gian nhanh chóng, đảm bảo sách đến tay bạn trong tình trạng tốt nhất.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-tag"></i>
+                    </div>
+                    <h3 class="feature-title">Giá cả hợp lý</h3>
+                    <p>Cam kết cung cấp sách với giá cả cạnh tranh nhất thị trường, cùng nhiều chương trình khuyến mãi hấp dẫn thường xuyên.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <h3 class="feature-title">Hỗ trợ 24/7</h3>
+                    <p>Đội ngũ chăm sóc khách hàng luôn sẵn sàng hỗ trợ bạn 24/7, giải đáp mọi thắc mắc và xử lý các vấn đề phát sinh.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Team Section -->
+        <section class="about-section">
+            <h2 class="section-title">Đội ngũ của chúng tôi</h2>
+            <div class="team-grid">
+                <div class="team-member">
+                    <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80" alt="Nguyễn Văn A" class="team-img">
+                    <div class="team-info">
+                        <h3 class="team-name">Nguyễn Văn A</h3>
+                        <p class="team-role">Founder & CEO</p>
+                        <p>Với 10 năm kinh nghiệm trong ngành xuất bản và phát hành sách.</p>
+                    </div>
+                </div>
+                <div class="team-member">
+                    <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80" alt="Trần Thị B" class="team-img">
+                    <div class="team-info">
+                        <h3 class="team-name">Trần Thị B</h3>
+                        <p class="team-role">Giám đốc kinh doanh</p>
+                        <p>Chuyên gia trong việc phát triển chiến lược kinh doanh và mở rộng thị trường.</p>
+                    </div>
+                </div>
+                <div class="team-member">
+                    <img src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80" alt="Lê Văn C" class="team-img">
+                    <div class="team-info">
+                        <h3 class="team-name">Lê Văn C</h3>
+                        <p class="team-role">Trưởng phòng biên tập</p>
+                        <p>Đảm bảo chất lượng nội dung và hình thức của từng cuốn sách.</p>
+                    </div>
+                </div>
+                <div class="team-member">
+                    <img src="https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1351&q=80" alt="Phạm Thị D" class="team-img">
+                    <div class="team-info">
+                        <h3 class="team-name">Phạm Thị D</h3>
+                        <p class="team-role">Chuyên viên CSKH</p>
+                        <p>Luôn nhiệt tình hỗ trợ và giải đáp mọi thắc mắc của khách hàng.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Testimonials Section -->
+        <section class="about-section">
+            <h2 class="section-title">Khách hàng nói gì về chúng tôi</h2>
+            <div class="testimonials-container">
+                <div class="testimonial">
+                    <p class="testimonial-text">"Tôi rất hài lòng với dịch vụ của BookStore. Sách luôn được giao đúng hẹn, chất lượng sách tốt và giá cả hợp lý. Đặc biệt, đội ngũ nhân viên rất nhiệt tình và chuyên nghiệp."</p>
+                    <div class="testimonial-author">
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80" alt="Nguyễn Minh T" class="author-img">
+                        <div class="author-info">
+                            <h4>Nguyễn Minh T</h4>
+                            <p>Giảng viên Đại học</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial">
+                    <p class="testimonial-text">"Là một người đam mê đọc sách, tôi đánh giá cao kho sách phong phú của BookStore. Tôi có thể dễ dàng tìm thấy những cuốn sách mình cần, kể cả những đầu sách khó tìm trên thị trường."</p>
+                    <div class="testimonial-author">
+                        <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80" alt="Trần Thanh H" class="author-img">
+                        <div class="author-info">
+                            <h4>Trần Thanh H</h4>
+                            <p>Nhà văn</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial">
+                    <p class="testimonial-text">"BookStore là địa chỉ tin cậy của tôi để mua sách cho con. Sách thiếu nhi ở đây rất đa dạng, hình ảnh đẹp và nội dung phong phú. Các chương trình khuyến mãi cũng rất hấp dẫn."</p>
+                    <div class="testimonial-author">
+                        <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80" alt="Lê Thị M" class="author-img">
+                        <div class="author-info">
+                            <h4>Lê Thị M</h4>
+                            <p>Phụ huynh</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="cta-section">
+            <h2 class="cta-title">Sẵn sàng khám phá thế giới sách?</h2>
+            <p>Tham gia cùng cộng đồng hơn 100.000 người yêu sách trên khắp Việt Nam</p>
+            <div class="cta-buttons">
+                <a href="/books" class="cta-btn cta-btn-primary">Khám phá ngay</a>
+                <a href="/auth/register" class="cta-btn cta-btn-secondary">Đăng ký thành viên</a>
+            </div>
+        </section>
+    </div>
+</main>
+
+<!-- Footer -->
+<footer class="main-footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h3 class="footer-title">Về BookStore</h3>
+                <p>Hệ thống quản lý và bán sách trực tuyến với nhiều thể loại đa dạng, phong phú.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+
+            <div class="footer-col">
+                <h3 class="footer-title">Liên kết nhanh</h3>
+                <ul class="footer-links">
+                    <li><a href="/">Trang chủ</a></li>
+                    <li><a href="/books">Danh sách sách</a></li>
+                    <li><a href="/categories">Thể loại</a></li>
+                    <li><a href="/about">Giới thiệu</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h3 class="footer-title">Hỗ trợ</h3>
+                <ul class="footer-links">
+                    <li><a href="#">Trợ giúp</a></li>
+                    <li><a href="#">FAQ</a></li>
+                    <li><a href="#">Liên hệ</a></li>
+                    <li><a href="#">Chính sách bảo mật</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h3 class="footer-title">Liên hệ</h3>
+                <p><i class="fas fa-map-marker-alt"></i> 123 Đường Sách, Hà Nội</p>
+                <p><i class="fas fa-phone"></i> (024) 123 4567</p>
+                <p><i class="fas fa-envelope"></i> info@bookstore.vn</p>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2023 BookStore. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+
+<script src="/js/shopping.js" defer></script>
+<script src="/js/user/auth.js" defer></script>
+<script src="/js/categories.js" defer></script>
+</body>
+</html>

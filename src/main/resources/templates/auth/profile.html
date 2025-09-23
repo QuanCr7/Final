@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BookStore - Trang Cá Nhân</title>
+    <link rel="stylesheet" href="/css/headandfoot.css">
+    <link rel="stylesheet" href="/css/shopping.css">
+    <link rel="stylesheet" href="/css/user/profile.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<!-- Header -->
+<div th:replace="~{guest/common/header :: header}"></div>
+
+<!-- Main Content -->
+<main class="main-content">
+    <div class="container">
+        <!-- Profile Section -->
+        <section class="profile-section">
+            <div class="section-header">
+                <h2 class="section-title"><i class="fas fa-user"></i> Thông tin cá nhân</h2>
+            </div>
+
+            <div id="loading" class="loading">
+                <div class="spinner"></div>
+                <p>Đang tải thông tin...</p>
+            </div>
+
+            <div id="errorMessage" class="error-message" style="display: none;">
+                <i class="fas fa-exclamation-circle"></i>
+                <span id="errorText"></span>
+            </div>
+
+            <div id="profileContent" style="display: none;">
+                <div class="profile-container">
+                    <div class="profile-sidebar">
+                        <div class="profile-image">
+                            <img id="userAvatar" src="/images/user/default-avatar.jpg" alt="Ảnh đại diện">
+                        </div>
+
+                        <h3 id="userDisplayName"></h3>
+
+                        <div class="profile-stats">
+                            <div class="stat-item">
+                                <i class="fas fa-book"></i>
+                                <span>Số sách đã mua: <strong id="booksBought">0</strong></span>
+                            </div>
+                            <div class="stat-item">
+                                <i class="fas fa-comment"></i>
+                                <span>Số bình luận: <strong id="commentsCount">0</strong></span>
+                            </div>
+                            <div class="stat-item">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span>Tham gia: <strong id="joinDate"></strong></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="profile-content">
+                        <div class="info-section">
+                            <h3><i class="fas fa-info-circle"></i> Thông tin cơ bản</h3>
+
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <div class="info-label">Tên đăng nhập</div>
+                                    <div class="info-value" id="username"></div>
+                                </div>
+
+                                <div class="info-item">
+                                    <div class="info-label">Họ và tên</div>
+                                    <div class="info-value empty" id="fullName">Chưa cập nhật</div>
+                                </div>
+
+                                <div class="info-item">
+                                    <div class="info-label">Email</div>
+                                    <div class="info-value empty" id="email">Chưa cập nhật</div>
+                                </div>
+
+                                <div class="info-item">
+                                    <div class="info-label">Số điện thoại</div>
+                                    <div class="info-value empty" id="phone">Chưa cập nhật</div>
+                                </div>
+
+                                <div class="info-item">
+                                    <div class="info-label">Ngày sinh</div>
+                                    <div class="info-value empty" id="dateOfBirth">Chưa cập nhật</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="info-section">
+                            <h3><i class="fas fa-map-marker-alt"></i> Thông tin khác</h3>
+
+                            <div class="info-item">
+                                <div class="info-label">Địa chỉ</div>
+                                <div class="info-value empty" id="address">Chưa cập nhật</div>
+                            </div>
+
+                            <div class="info-item">
+                                <div class="info-label">Mô tả bản thân</div>
+                                <div class="info-value empty" id="description">Chưa cập nhật</div>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <a href="/settings" class="btn success-btn">
+                                <i class="fas fa-edit"></i> Chỉnh sửa thông tin
+                            </a>
+                            <a href="/change-password" class="btn info-btn">
+                                <i class="fas fa-key"></i> Đổi mật khẩu
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</main>
+
+<!-- Footer -->
+<div th:replace="~{guest/common/footer :: footer}"></div>
+
+<script src="/js/user/profile.js" defer></script>
+<script src="/js/shopping.js" defer></script>
+<script src="/js/user/auth.js" defer></script>
+<script src="/js/categories.js" defer></script>
+</body>
+</html>

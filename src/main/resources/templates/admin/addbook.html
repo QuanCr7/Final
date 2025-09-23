@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thêm sách mới</title>
+    <link rel="stylesheet" href="/css/book/addbook.css">
+</head>
+<body>
+<div class="form-container">
+    <h1 style="text-align: center;">Thêm sách mới</h1>
+    <form id="addBookForm" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="title">Tên sách *</label>
+            <input type="text" id="title" name="title" required>
+        </div>
+
+        <div class="form-group">
+            <label for="author">Tác giả *</label>
+            <input type="text" id="author" name="author" required>
+        </div>
+
+        <div class="form-group">
+            <label for="price">Giá *</label>
+            <input type="number" id="price" name="price" min="0" required>
+        </div>
+
+        <div class="form-group">
+            <label for="publisher">Nhà xuất bản *</label>
+            <input type="text" id="publisher" name="publisher" required>
+        </div>
+
+        <div class="form-group">
+            <label for="description">Mô tả</label>
+            <textarea id="description" name="description"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label>Thể loại</label>
+            <div id="categoryCheckboxes" class="checkbox-container">
+                <div class="loading-categories">Đang tải thể loại...</div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="images">Hình ảnh (có thể chọn nhiều ảnh)</label>
+            <input type="file" id="images" name="images" multiple accept="image/*">
+            <div class="image-preview" id="imagePreview"></div>
+        </div>
+
+        <div class="button-group">
+            <button type="submit" id="submitBtn">Thêm sách</button>
+            <button type="button" id="cancelBtn" onclick="window.history.back()">Hủy</button>
+        </div>
+    </form>
+</div>
+
+<div id="loading" class="loading" style="display: none;"></div>
+<div id="error" class="error" style="display: none;"></div>
+
+<script src="/js/book/add-book.js"  defer></script>
+</body>
+</html>

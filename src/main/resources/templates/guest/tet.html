@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập và hiển thị thông tin người dùng</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .login-container, .user-info {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        .error {
+            color: red;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .success {
+            color: green;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .user-info {
+            display: none;
+        }
+        .user-info.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+<div class="login-container">
+    <h2>Đăng nhập</h2>
+    <div id="error" class="error"></div>
+    <div id="success" class="success"></div>
+    <div class="form-group">
+        <label for="username">Tên đăng nhập</label>
+        <input type="text" id="username" placeholder="Nhập tên đăng nhập">
+    </div>
+    <div class="form-group">
+        <label for="password">Mật khẩu</label>
+        <input type="password" id="password" placeholder="Nhập mật khẩu">
+    </div>
+    <button onclick="login()">Đăng nhập</button>
+</div>
+
+<div id="userInfo" class="user-info">
+    <h2>Thông tin người dùng</h2>
+    <p><strong>ID:</strong> <span id="userId"></span></p>
+    <p><strong>Tên đăng nhập:</strong> <span id="usernameDisplay"></span></p>
+    <p><strong>Họ tên:</strong> <span id="fullName"></span></p>
+    <p><strong>Email:</strong> <span id="email"></span></p>
+    <p><strong>Số điện thoại:</strong> <span id="phone"></span></p>
+    <p><strong>Địa chỉ:</strong> <span id="address"></span></p>
+    <p><strong>Ngày sinh:</strong> <span id="dateOfBirth"></span></p>
+    <p><strong>Ngày tạo:</strong> <span id="dateCreate"></span></p>
+    <p><strong>Mô tả:</strong> <span id="description"></span></p>
+    <p><strong>Ảnh đại diện:</strong> <img id="userImage" src="" alt="Ảnh đại diện" style="max-width: 100px; display: none;"></p>
+    <p><strong>Access Token hết hạn:</strong> <span id="accessTokenExpiry"></span></p>
+    <p><strong>Refresh Token hết hạn:</strong> <span id="refreshTokenExpiry"></span></p>
+    <button onclick="logout()">Đăng xuất</button>
+</div>
+
+<script>
+    const API_BASE_URL = 'http://localhost:8080'; // Thay đổi URL nếu cần
+
+    async function login() {
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const errorDiv = document.getElementById('error');
+        const successDiv = document.getElementById('success');
+
+        if (!username || !password) {
+            errorDiv.textContent = 'Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu';
+            successDiv.textContent = '';
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/auth/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+
+            const result = await response.json();
+            console.log('Login response:', JSON.stringify(result, null, 2));
+
+            if (response.ok && result.code === 200) {
+                successDiv.textContent = 'Đăng nhập thành công';
+                errorDiv.textContent = '';
+                localStorage.setItem('accessToken', result.data.accessToken);
+                localStorage.setItem('refreshToken', result.data.refreshToken);
+                document.querySelector('.login-container').style.display = 'none';
+                await fetchUserInfo(result.data);
+            } else {
+                errorDiv.textContent = result.message || 'Đăng nhập thất bại';
+                successDiv.textContent = '';
+            }
+        } catch (error) {
+            errorDiv.textContent = 'Đã có lỗi xảy ra khi đăng nhập. Vui lòng thử lại.';
+            successDiv.textContent = '';
+            console.error('Login error:', error);
+        }
+    }
+
+    async function fetchUserInfo(loginData) {
+        const token = localStorage.getItem('accessToken');
+        if (!token) {
+            document.getElementById('error').textContent = 'Không tìm thấy token. Vui lòng đăng nhập lại.';
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/account/profile`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            const result = await response.json();
+            console.log('Profile response:', JSON.stringify(result, null, 2));
+
+            if (response.ok && result.code === 200) {
+                const user = result.data;
+                console.log('Assigning user data:', user); // Debug: Kiểm tra dữ liệu được gán
+                document.getElementById('userId').textContent = user.id || 'N/A';
+                document.getElementById('usernameDisplay').textContent = user.username || 'N/A';
+                document.getElementById('fullName').textContent = user.fullName || 'N/A';
+                document.getElementById('email').textContent = user.email || 'N/A';
+                document.getElementById('phone').textContent = user.phone || 'N/A';
+                document.getElementById('address').textContent = user.address || 'N/A';
+                document.getElementById('dateOfBirth').textContent = user.dateOfBirth || 'N/A';
+                document.getElementById('dateCreate').textContent = user.dateCreate || 'N/A';
+                document.getElementById('description').textContent = user.description || 'N/A';
+
+                const userImage = document.getElementById('userImage');
+                if (user.imageUrl) {
+                    userImage.src = `${API_BASE_URL}/images/user/${user.imageUrl}`;
+                    userImage.style.display = 'block';
+                } else {
+                    userImage.style.display = 'none';
+                }
+
+                // Hiển thị thời gian hết hạn token từ loginData
+                if (loginData) {
+                    document.getElementById('accessTokenExpiry').textContent = loginData.accessTokenExpiryDate ? new Date(loginData.accessTokenExpiryDate).toLocaleString('vi-VN') : 'N/A';
+                    document.getElementById('refreshTokenExpiry').textContent = loginData.refreshTokenExpiryDate ? new Date(loginData.refreshTokenExpiryDate).toLocaleString('vi-VN') : 'N/A';
+                }
+
+                console.log('Showing user info section'); // Debug: Xác nhận hiển thị
+                document.getElementById('userInfo').classList.add('show');
+            } else {
+                document.getElementById('error').textContent = result.message || 'Không thể lấy thông tin người dùng';
+            }
+        } catch (error) {
+            document.getElementById('error').textContent = 'Đã có lỗi xảy ra khi lấy thông tin người dùng';
+            console.error('Profile error:', error);
+        }
+    }
+
+    async function logout() {
+        const token = localStorage.getItem('accessToken');
+        if (!token) return;
+
+        try {
+            await fetch(`${API_BASE_URL}/auth/logout`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+        } catch (error) {
+            console.error('Lỗi khi đăng xuất:', error);
+        }
+
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        document.querySelector('.login-container').style.display = 'block';
+        document.getElementById('userInfo').classList.remove('show');
+        document.getElementById('username').value = '';
+        document.getElementById('password').value = '';
+        document.getElementById('error').textContent = '';
+        document.getElementById('success').textContent = '';
+    }
+
+    // Kiểm tra nếu đã có token khi tải trang
+    window.onload = () => {
+        if (localStorage.getItem('accessToken')) {
+            document.querySelector('.login-container').style.display = 'none';
+            fetchUserInfo();
+        }
+    };
+</script>
+</body>
+</html>

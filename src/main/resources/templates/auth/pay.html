@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/headandfoot.css">
+    <link rel="stylesheet" href="/css/pay.css">
+    <title>BookStore - Thanh toán</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+<!-- Header -->
+<header class="main-header">
+    <div class="container">
+        <div class="header-content">
+            <div class="logo-container">
+                <a href="/" class="logo">
+                    <i class="fas fa-book-open logo-icon"></i>
+                    <span class="logo-text">BookStore</span>
+                </a>
+            </div>
+
+            <nav class="main-nav">
+                <ul class="nav-list">
+                    <li class="nav-item"><a href="/" class="nav-link active"><i class="fas fa-home"></i> Trang chủ</a></li>
+                    <li class="nav-item"><a href="/search" class="nav-link"><i class="fas fa-search"></i> Tìm kiếm</a></li>
+                    <li class="nav-item">
+                        <span class="nav-link"><i class="fas fa-tags"></i> Thể loại</span>
+                        <div class="categories-dropdown">
+                            <div class="categories-container">
+                                <!-- Nội dung sẽ được thêm bằng JavaScript -->
+                            </div>
+                        </div>
+                    </li>
+                    <li class="nav-item"><a href="/about" class="nav-link"><i class="fas fa-info-circle"></i> Giới thiệu</a></li>
+                </ul>
+            </nav>
+
+            <div class="auth-section">
+                <a href="/auth/login" class="auth-btn login-btn"><i class="fas fa-sign-in-alt"></i> Đăng nhập</a>
+                <a href="/auth/register" class="auth-btn register-btn"><i class="fas fa-user-plus"></i> Đăng ký</a>
+            </div>
+
+            <button class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </div>
+</header>
+
+<!-- Main Content -->
+<main class="main-content">
+    <div class="container">
+        <h1 class="checkout-title">
+            <i class="fas fa-shopping-cart"></i> Thanh toán
+        </h1>
+
+        <div class="checkout-container">
+            <!-- Left Column - Customer Info & Payment -->
+            <div class="checkout-left">
+                <!-- Customer Information -->
+                <div class="checkout-card">
+                    <h2 class="card-title">
+                        <i class="fas fa-user"></i> Thông tin khách hàng
+                    </h2>
+
+                    <form id="customer-form">
+                        <div class="form-group">
+                            <label class="form-label" for="fullname">Họ và tên *</label>
+                            <input type="text" id="fullname" class="form-input" placeholder="Nhập họ và tên" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="email">Email *</label>
+                            <input type="email" id="email" class="form-input" placeholder="Nhập email" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="phone">Số điện thoại *</label>
+                            <input type="tel" id="phone" class="form-input" placeholder="Nhập số điện thoại" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="address">Địa chỉ giao hàng *</label>
+                            <textarea id="address" class="form-input" rows="3" placeholder="Nhập địa chỉ giao hàng" required></textarea>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label" for="city">Thành phố *</label>
+                                <input type="text" id="city" class="form-input" placeholder="Nhập thành phố" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="district">Quận/Huyện *</label>
+                                <input type="text" id="district" class="form-input" placeholder="Nhập quận/huyện" required>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Payment Method -->
+                <div class="checkout-card">
+                    <h2 class="card-title">
+                        <i class="fas fa-credit-card"></i> Phương thức thanh toán
+                    </h2>
+
+                    <div class="payment-methods">
+                        <label class="payment-method">
+                            <input type="radio" name="payment-method" value="cod" checked>
+                            <i class="fas fa-money-bill-wave payment-icon"></i>
+                            <span>Thanh toán khi nhận hàng (COD)</span>
+                        </label>
+
+                        <label class="payment-method">
+                            <input type="radio" name="payment-method" value="banking">
+                            <i class="fas fa-university payment-icon"></i>
+                            <span>Chuyển khoản ngân hàng</span>
+                        </label>
+
+                        <label class="payment-method">
+                            <input type="radio" name="payment-method" value="momo">
+                            <i class="fas fa-mobile-alt payment-icon"></i>
+                            <span>Ví điện tử MoMo</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column - Order Summary -->
+            <div class="checkout-right">
+                <div class="checkout-card order-summary">
+                    <h2 class="card-title">
+                        <i class="fas fa-receipt"></i> Đơn hàng của bạn
+                    </h2>
+
+                    <!-- Book Items -->
+                    <div class="book-items" id="bookItemsContainer">
+                        <!-- Nội dung sẽ được thêm bằng JavaScript -->
+                    </div>
+
+                    <!-- Order Summary -->
+                    <div class="summary">
+                        <div class="summary-item">
+                            <span>Tạm tính:</span>
+                            <span id="subtotal">0₫</span>
+                        </div>
+
+                        <div class="summary-item">
+                            <span>Phí vận chuyển:</span>
+                            <span id="shipping">20.000₫</span>
+                        </div>
+
+                        <div class="summary-item">
+                            <span>Giảm giá:</span>
+                            <span id="discount">-0₫</span>
+                        </div>
+
+                        <div class="summary-total">
+                            <span>Tổng cộng:</span>
+                            <span id="total">0₫</span>
+                        </div>
+                    </div>
+
+                    <button class="checkout-btn" id="completeOrderBtn">
+                        <i class="fas fa-lock"></i> Hoàn tất đơn hàng
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Footer -->
+<footer class="main-footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h3 class="footer-title">Về BookStore</h3>
+                <p>Hệ thống quản lý và bán sách trực tuyến với nhiều thể loại đa dạng, phong phú.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+
+            <div class="footer-col">
+                <h3 class="footer-title">Liên kết nhanh</h3>
+                <ul class="footer-links">
+                    <li><a href="/trangchu">Trang chủ</a></li>
+                    <li><a href="/books">Danh sách sách</a></li>
+                    <li><a href="/categories">Thể loại</a></li>
+                    <li><a href="/about">Giới thiệu</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h3 class="footer-title">Hỗ trợ</h3>
+                <ul class="footer-links">
+                    <li><a href="#">Trợ giúp</a></li>
+                    <li><a href="#">FAQ</a></li>
+                    <li><a href="#">Liên hệ</a></li>
+                    <li><a href="#">Chính sách bảo mật</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h3 class="footer-title">Liên hệ</h3>
+                <p><i class="fas fa-map-marker-alt"></i> 123 Đường Sách, Hà Nội</p>
+                <p><i class="fas fa-phone"></i> (024) 123 4567</p>
+                <p><i class="fas fa-envelope"></i> info@bookstore.vn</p>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2023 BookStore. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+
+<script src="/js/user/auth.js" defer></script>
+<script src="/js/user/pay.js" defer></script>
+<script src="/js/categories.js" defer></script>
+</body>
+</html>

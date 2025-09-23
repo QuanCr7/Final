@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết Tài khoản - Hệ thống Quản lý</title>
+    <link rel="stylesheet" href="/css/user/accountdetail.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>👤</text></svg>">
+
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1><i class="fas fa-user-circle"></i> Chi tiết Tài khoản</h1>
+        <div class="header-actions">
+            <button class="btn btn-outline" onclick="window.history.back()">
+                <i class="fas fa-arrow-left"></i> Quay lại
+            </button>
+        </div>
+    </div>
+
+    <!-- Debug: Hiển thị toàn bộ object user để kiểm tra -->
+    <div th:if="${user}" style="display: none;" th:text="${user}"></div>
+
+    <div th:if="${user}" class="account-detail-container">
+        <div class="profile-card">
+            <img th:src="${user.imageUrl != null and user.imageUrl != ''} ?
+     '/images/user/' + ${user.imageUrl} : '/images/user/default.jpg'"
+                 th:alt="${user.fullName}" class="profile-image"
+                 onerror="this.src='/images/user/default.jpg'">
+            <h2 class="profile-name" th:text="${user.fullName != null} ? ${user.fullName} : 'Chưa cập nhật'">Họ và tên</h2>
+            <p class="profile-username" th:text="'@' + ${user.username}">@username</p>
+
+            <div class="profile-stats">
+                <div class="stat">
+                    <div class="stat-value" th:text="${user.dateCreate != null} ? ${#temporals.format(user.dateCreate, 'dd/MM/yyyy')} : 'N/A'">01/01/2023</div>
+                    <div class="stat-label">Ngày tham gia</div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="info-card">
+            <div class="card-header">
+                <h3 class="card-title">Thông tin chi tiết</h3>
+            </div>
+
+            <div class="section">
+                <h4 class="section-title">Thông tin cá nhân</h4>
+                <div class="info-grid">
+                    <div class="info-group">
+                        <div class="info-label">ID</div>
+                        <div class="info-value" th:text="${user.id}">123</div>
+                    </div>
+                    <div class="info-group">
+                        <div class="info-label">Tên đăng nhập</div>
+                        <div class="info-value" th:text="${user.username}">username</div>
+                    </div>
+                    <div class="info-group">
+                        <div class="info-label">Họ và tên</div>
+                        <div class="info-value" th:text="${user.fullName != null} ? ${user.fullName} : 'Chưa cập nhật'">Họ và tên</div>
+                    </div>
+                    <div class="info-group">
+                        <div class="info-label">Email</div>
+                        <div class="info-value" th:text="${user.email != null} ? ${user.email} : 'Chưa cập nhật'">email@example.com</div>
+                    </div>
+                    <div class="info-group">
+                        <div class="info-label">Số điện thoại</div>
+                        <div class="info-value" th:text="${user.phone != null} ? ${user.phone} : 'Chưa cập nhật'">0123456789</div>
+                    </div>
+                    <div class="info-group">
+                        <div class="info-label">Ngày sinh</div>
+                        <div class="info-value" th:text="${user.dateOfBirth != null} ? ${#temporals.format(user.dateOfBirth, 'dd/MM/yyyy')} : 'Chưa cập nhật'">01/01/1990</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h4 class="section-title">Thông tin liên hệ</h4>
+                <div class="info-group">
+                    <div class="info-label">Địa chỉ</div>
+                    <div class="info-value" th:text="${user.address != null} ? ${user.address} : 'Chưa cập nhật'">Địa chỉ</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h4 class="section-title">Mô tả</h4>
+                <div class="info-group">
+                    <div class="info-value" th:text="${user.description != null} ? ${user.description} : 'Chưa có mô tả'">Mô tả</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:if="${error}" class="error">
+        <i class="fas fa-exclamation-triangle"></i>
+        <span th:text="${error}">Lỗi khi tải thông tin tài khoản</span>
+    </div>
+
+    <!-- Hiển thị thông báo nếu user là null -->
+    <div th:unless="${user}" class="error">
+        <i class="fas fa-exclamation-triangle"></i>
+        <span>Không thể tải thông tin tài khoản. User object là null.</span>
+    </div>
+</div>
+
+<!-- Modal chỉnh sửa thông tin -->
+<div class="modal-overlay" id="editModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 class="modal-title"><i class="fas fa-edit"></i> Chỉnh sửa thông tin</h3>
+            <button class="modal-close" id="closeEditModal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="editForm">
+                <input type="hidden" id="editUserId">
+                <div class="form-group">
+                    <label class="form-label" for="editUsername">Tên đăng nhập</label>
+                    <input type="text" class="form-control" id="editUsername" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="editFullName">Họ và tên</label>
+                    <input type="text" class="form-control" id="editFullName" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="editEmail">Email</label>
+                    <input type="email" class="form-control" id="editEmail" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="editPhone">Số điện thoại</label>
+                    <input type="tel" class="form-control" id="editPhone">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="editAddress">Địa chỉ</label>
+                    <textarea class="form-control" id="editAddress"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="editDescription">Mô tả</label>
+                    <textarea class="form-control" id="editDescription"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="editDateOfBirth">Ngày sinh</label>
+                    <input type="date" class="form-control" id="editDateOfBirth">
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" id="cancelEdit">Hủy bỏ</button>
+            <button class="btn btn-primary" id="saveChanges">Lưu thay đổi</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal xác nhận xóa -->
+<div class="modal-overlay" id="deleteModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 class="modal-title"><i class="fas fa-exclamation-triangle"></i> Xác nhận xóa</h3>
+            <button class="modal-close" id="closeDeleteModal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p>Bạn có chắc chắn muốn xóa tài khoản "<span id="deleteUserName"></span>" (ID: <span id="deleteUserId"></span>)?</p>
+            <p class="warning-text"><i class="fas fa-exclamation-circle"></i> Hành động này không thể hoàn tác.</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" id="cancelDelete">Hủy bỏ</button>
+            <button class="btn btn-danger" id="confirmDelete">Xóa tài khoản</button>
+        </div>
+    </div>
+</div>
+
+<!-- Thông báo -->
+<div class="notification" id="notification">
+    <i class="fas fa-check-circle"></i>
+    <span id="notification-message"></span>
+</div>
+
+<script src="/js/user/account-detail.js" defer></script>
+</body>
+</html>

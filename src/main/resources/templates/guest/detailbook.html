@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết sách</title>
+    <link rel="stylesheet" href="/css/headandfoot.css">
+    <link rel="stylesheet" href="/css/shopping.css">
+    <link rel="stylesheet" href="/css/book/detailbook.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/school.png">
+</head>
+<body>
+<!-- Header -->
+<div th:replace="~{guest/common/header :: header}"></div>
+
+<main class="main-content">
+    <section class="detail-section">
+        <div class="container">
+            <div id="loading" class="loading">Đang tải thông tin sách...</div>
+            <div id="error" class="error" style="display: none;"></div>
+
+            <div id="book-detail" style="display: none;">
+                <div class="book-header">
+                    <div class="book-images">
+                        <img id="mainImage" class="main-image" src="" alt="Ảnh sách">
+                        <div class="thumbnail-container" id="thumbnails"></div>
+                    </div>
+                    <div class="book-info">
+                        <h1 class="book-title" id="bookTitle"></h1>
+                        <div class="book-meta">
+                            <span><strong>Tác giả:</strong> <span id="bookAuthor"></span></span>
+                            <span><strong>Nhà xuất bản:</strong> <span id="bookPublisher"></span></span>
+                            <span><strong>Ngày phát hành:</strong> <span id="bookDate"></span></span>
+                        </div>
+                        <div class="book-price" id="bookPrice"></div>
+
+                        <div class="section-title">Thông tin chi tiết</div>
+                        <div class="book-description" id="bookDescription"></div>
+
+                        <div class="section-title">Thể loại</div>
+                        <div id="bookCategories"></div>
+
+                        <div class="action-buttons">
+                            <button class="btn btn-back" onclick="window.history.back()">
+                                <i class="fas fa-arrow-left"></i> Quay lại
+                            </button>
+                            <button class="btn btn-add" id="addBtn">
+                                <i class="fas fa-cart-plus"></i>Thêm vào giỏ hàng
+                            </button>
+                            <!--                    <button class="btn btn-edit" id="editBtn">Sửa sách</button>-->
+                            <!--                    <button class="btn btn-delete" id="deleteBtn">Xóa sách</button>-->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Phần Comment Section -->
+            <div class="comment-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-comments"></i> Bình luận
+                        <span id="commentCount" class="comment-count">(0)</span>
+                    </h2>
+                </div>
+
+                <!-- Form thêm comment -->
+                <div class="comment-form-container">
+                    <form id="commentForm" class="comment-form">
+                        <div class="form-group">
+                            <label for="commentContent" class="form-label">
+                                <i class="fas fa-edit"></i> Viết bình luận của bạn
+                            </label>
+                            <textarea
+                                    id="commentContent"
+                                    name="content"
+                                    rows="4"
+                                    placeholder="Chia sẻ cảm nhận của bạn về cuốn sách này..."
+                                    class="comment-textarea"
+                                    required
+                            ></textarea>
+                        </div>
+                        <div class="form-actions">
+                            <div class="rating-section">
+                                <span class="rating-label">Đánh giá:</span>
+                                <div class="star-rating">
+                                    <input type="radio" id="star5" name="rating" value="5">
+                                    <label for="star5" title="5 sao">★</label>
+                                    <input type="radio" id="star4" name="rating" value="4">
+                                    <label for="star4" title="4 sao">★</label>
+                                    <input type="radio" id="star3" name="rating" value="3">
+                                    <label for="star3" title="3 sao">★</label>
+                                    <input type="radio" id="star2" name="rating" value="2">
+                                    <label for="star2" title="2 sao">★</label>
+                                    <input type="radio" id="star1" name="rating" value="1">
+                                    <label for="star1" title="1 sao">★</label>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary" id="submitComment">
+                                <i class="fas fa-paper-plane"></i> Gửi bình luận
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Danh sách comments -->
+                <div id="commentsList" class="comments-list">
+                    <div class="loading-comments">
+                        <i class="fas fa-spinner fa-spin"></i> Đang tải bình luận...
+                    </div>
+                </div>
+
+                <!-- Phân trang comments -->
+                <div id="commentPagination" class="comment-pagination"></div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<!-- Footer -->
+<div th:replace="~{guest/common/footer :: footer}"></div>
+
+<script src="/js/shopping.js" defer></script>
+<script src="/js/user/auth.js" defer></script>
+<script src="/js/categories.js" defer></script>
+<script src="/js/book/detail.js" defer></script>
+</body>
+</html>

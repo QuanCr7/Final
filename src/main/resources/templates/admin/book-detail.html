@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết Sách - Hệ thống Quản lý</title>
+    <link rel="stylesheet" href="/css/book/admin-book.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📚</text></svg>">
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1><i class="fas fa-book"></i> Chi tiết Sách</h1>
+        <div class="header-actions">
+            <button class="btn btn-outline" onclick="window.history.back()">
+                <i class="fas fa-arrow-left"></i> Quay lại
+            </button>
+        </div>
+    </div>
+
+    <div id="loading" class="loading">
+        <i class="fas fa-spinner fa-spin"></i> Đang tải thông tin sách...
+    </div>
+
+    <div id="error" class="error" style="display: none;"></div>
+
+    <div id="book-detail" class="book-detail-container" style="display: none;">
+        <!-- Nội dung sẽ được điền bằng JavaScript -->
+    </div>
+</div>
+
+<!-- Modal xác nhận xóa -->
+<div class="modal-overlay" id="deleteModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 class="modal-title"><i class="fas fa-exclamation-triangle"></i> Xác nhận xóa</h3>
+            <button class="modal-close" id="closeDeleteModal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p>Bạn có chắc chắn muốn xóa sách "<span id="deleteBookTitle"></span>" (ID: <span id="deleteBookId"></span>)?</p>
+            <p class="warning-text"><i class="fas fa-exclamation-circle"></i> Hành động này không thể hoàn tác.</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" id="cancelDelete">Hủy bỏ</button>
+            <button class="btn btn-danger" id="confirmDelete">Xóa sách</button>
+        </div>
+    </div>
+</div>
+
+<!-- Thông báo -->
+<div class="notification" id="notification">
+    <i class="fas fa-check-circle"></i>
+    <span id="notification-message"></span>
+</div>
+
+<script src="/js/book/book-detail.js"  defer></script>
+</body>
+</html>

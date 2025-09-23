@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cập nhật sách</title>
+    <link rel="stylesheet" href="/css/book/updatebook.css">
+</head>
+<body>
+<div class="container">
+    <h1>Cập nhật thông tin sách</h1>
+    <form id="updateBookForm">
+        <input type="hidden" id="bookId">
+
+        <div class="form-group">
+            <label for="title">Tên sách *</label>
+            <input type="text" id="title" name="title" required>
+            <div id="titleError" class="error"></div>
+        </div>
+
+        <div class="form-group">
+            <label for="author">Tác giả *</label>
+            <input type="text" id="author" name="author" required>
+            <div id="authorError" class="error"></div>
+        </div>
+
+        <div class="form-group">
+            <label for="price">Giá (VND) *</label>
+            <input type="number" id="price" name="price" min="0" step="0.01" placeholder="0.00" required>
+            <div id="priceError" class="error"></div>
+        </div>
+
+        <div class="form-group">
+            <label for="description">Mô tả</label>
+            <textarea id="description" name="description"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="publisher">Nhà xuất bản</label>
+            <input type="text" id="publisher" name="publisher">
+        </div>
+
+        <div class="form-group">
+            <label>Danh mục *</label>
+            <div id="categoriesContainer" class="category-container"></div>
+            <div id="categoryError" class="error"></div>
+        </div>
+
+        <div class="form-group">
+            <label for="images">Hình ảnh (Có thể chọn nhiều ảnh)</label>
+            <input type="file" id="images" name="images" multiple accept="image/*">
+            <div class="image-preview" id="imagePreview"></div>
+        </div>
+
+        <div class="form-group">
+            <button type="submit" class="btn">Cập nhật sách</button>
+            <button type="button" class="btn btn-secondary" onclick="window.history.back()">Quay lại</button>
+        </div>
+    </form>
+</div>
+
+<script src="/js/book/update-book.js" defer></script>
+</body>
+</html>

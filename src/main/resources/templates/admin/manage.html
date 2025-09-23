@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ thống Quản lý</title>
+    <link rel="stylesheet" href="/css/admin/manage.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚙️</text></svg>">
+</head>
+
+<body>
+<div class="admin-container">
+    <div class="admin-header">
+        <h1 class="admin-title"><i class="fas fa-cogs"></i> Hệ thống Quản lý</h1>
+        <div class="user-info">
+            <span>Xin chào, Admin</span>
+            <button class="btn btn-danger" onclick="window.location.href='/'"><i class="fas fa-sign-out-alt"></i> Đăng xuất</button>
+        </div>
+    </div>
+
+    <!-- Thanh điều hướng đã được cải thiện -->
+    <div class="admin-nav">
+        <button class="admin-tab active" data-tab="books">
+            <i class="fas fa-book"></i> Quản lý Sách
+        </button>
+        <button class="admin-tab" data-tab="users">
+            <i class="fas fa-users"></i> Quản lý Người dùng
+        </button>
+        <button class="admin-tab" data-tab="orders">
+            <i class="fas fa-shopping-cart"></i> Quản lý Đơn hàng
+        </button>
+    </div>
+
+    <!-- Tab Quản lý Sách -->
+    <div id="books-tab" class="tab-content active">
+        <div class="tab-header">
+            <h2 class="tab-title"><i class="fas fa-book"></i> Quản lý Sách</h2>
+            <div class="search-box">
+                <input type="text" class="search-input" placeholder="Tìm kiếm sách...">
+                <button class="btn btn-primary"><i class="fas fa-search"></i> Tìm kiếm</button>
+                <button class="btn btn-success" onclick="window.location.href='/add'"><i class="fas fa-plus"></i> Thêm sách</button>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table id="books-table">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Tên sách</th>
+                    <th>Tác giả</th>
+                    <th>Thể loại</th>
+                    <th>Giá</th>
+                    <th>Thao tác</th>
+                </tr>
+                </thead>
+                <tbody id="books-table-body">
+                <!-- Dữ liệu sách sẽ được thêm bằng JavaScript -->
+                </tbody>
+            </table>
+        </div>
+
+        <div id="pagination" class="pagination">
+            <!-- Phân trang sẽ được thêm bằng JavaScript -->
+        </div>
+    </div>
+
+    <!-- Tab Quản lý Người dùng -->
+    <div id="users-tab" class="tab-content">
+        <div class="tab-header">
+            <h2 class="tab-title"><i class="fas fa-users"></i> Quản lý Người dùng</h2>
+            <div class="search-box">
+                <input type="text" class="search-input" placeholder="Tìm kiếm người dùng...">
+                <button class="btn btn-primary"><i class="fas fa-search"></i> Tìm kiếm</button>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Tên Đăng Nhập</th>
+                    <th>Họ tên</th>
+                    <th>Email</th>
+                    <th>Số điện thoại</th>
+                    <th>Địa chỉ</th>
+                    <th>Ngày đăng ký</th>
+                    <th>Thao tác</th>
+                </tr>
+                </thead>
+                <tbody id="accounts-table-body">
+                <!-- Dữ liệu người dùng sẽ được thêm ở đây -->
+                </tbody>
+            </table>
+        </div>
+
+        <div id="pagination-accounts" class="pagination">
+            <!-- Phân trang cho account sẽ được thêm bằng JavaScript -->
+        </div>
+    </div>
+    </div>
+
+    <!-- Tab Quản lý Đơn hàng -->
+    <div id="orders-tab" class="tab-content">
+        <div class="tab-header">
+            <h2 class="tab-title"><i class="fas fa-shopping-cart"></i> Quản lý Đơn hàng</h2>
+            <div class="search-box">
+                <input type="text" class="search-input" placeholder="Tìm kiếm đơn hàng...">
+                <button class="btn btn-primary"><i class="fas fa-search"></i> Tìm kiếm</button>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                <tr>
+                    <th>Mã đơn</th>
+                    <th>Khách hàng</th>
+                    <th>Ngày đặt</th>
+                    <th>Tổng tiền</th>
+                    <th>Phương thức</th>
+                    <th>Trạng thái</th>
+                    <th>Thao tác</th>
+                </tr>
+                </thead>
+                <tbody>
+                <!-- Dữ liệu đơn hàng sẽ được thêm ở đây -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal xác nhận xóa -->
+<div class="modal-overlay" id="deleteModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 class="modal-title"><i class="fas fa-exclamation-triangle"></i> Xác nhận xóa</h3>
+            <button class="modal-close" id="closeModal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p>Bạn có chắc chắn muốn xóa sách "<span id="bookTitle"></span>" (ID: <span id="bookId"></span>)?</p>
+            <p class="warning-text"><i class="fas fa-exclamation-circle"></i> Hành động này không thể hoàn tác.</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" id="cancelDelete">Hủy bỏ</button>
+            <button class="btn btn-danger" id="confirmDelete">Xóa sách</button>
+        </div>
+    </div>
+</div>
+
+<!-- Thông báo -->
+<div class="notification" id="notification">
+    <i class="fas fa-check-circle"></i>
+    <span id="notification-message"></span>
+</div>
+
+<script src="/js/admin/manage.js" defer></script>
+</body>
+</html>
