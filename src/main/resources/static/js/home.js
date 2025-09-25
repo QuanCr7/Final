@@ -2,7 +2,12 @@ let currentPage = 1;
 
 // Gọi khi trang được tải
 document.addEventListener('DOMContentLoaded', function () {
-    if (window.location.search !== '') {z
+    // Kiểm tra trạng thái đăng nhập trước khi tải nội dung (từ auth.js)
+    if (typeof checkLoginStatus === 'function') {
+        checkLoginStatus();
+    }
+
+    if (window.location.search !== '') {
         loadFromUrl();
     } else {
         fetchBooks();
@@ -181,47 +186,6 @@ function renderPagination(currentPage, totalPages) {
 function viewBookDetail(bookId) {
     window.location.href = `/detail?id=${bookId}`;
 }
-
-
-// <button className="action-btn edit-btn" onClick="editBook(${book.id})">
-//     <i className="fas fa-edit"></i> Sửa
-// </button>
-// <button className="action-btn delete-btn" onClick="deleteBook(${book.id})">
-//     <i className="fas fa-trash"></i> Xóa
-// </button>
-// // Hàm chứa đường dẫn sách
-// function editBook(bookId) {
-//     window.location.href = `/update?id=${bookId}`;
-// }
-//
-// // Hàm chứa đường dẫn xóa sách
-// function deleteBook(bookId) {
-//     if (confirm(`Bạn có chắc chắn muốn xóa sách có ID: ${bookId}?`)) {
-//         const loadingElement = document.getElementById('loading');
-//         loadingElement.style.display = 'flex';
-//         loadingElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i><p>Đang xóa sách...</p>';
-//
-//         fetch(`/book/delete/${bookId}`, {
-//             method: 'DELETE'
-//         })
-//             .then(response => {
-//                 if (!response.ok) {
-//                     throw new Error('Xóa sách không thành công');
-//                 }
-//                 return response.json();
-//             })
-//             .then(data => {
-//                 loadingElement.style.display = 'none';
-//                 showNotification('Xóa sách thành công', 'success');
-//                 fetchBooks(currentPage);
-//             })
-//             .catch(error => {
-//                 loadingElement.style.display = 'none';
-//                 showNotification(error.message, 'error');
-//                 console.error('Lỗi khi xóa sách:', error);
-//             });
-//     }
-// }
 
 // Hàm hiển thị thông báo
 function showNotification(message, type) {

@@ -1,7 +1,6 @@
 package com.example.website.controller.API;
 
 import com.example.website.configuration.JwtTokenProvider;
-import com.example.website.request.RefreshTokenRequest;
 import com.example.website.request.UserLoginRequest;
 import com.example.website.response.UserLoginResponse;
 import com.example.website.request.UserRegisterRequest;
@@ -34,16 +33,16 @@ public class AuthController extends BaseController {
             @RequestBody UserLoginRequest request, HttpServletResponse response) {
             UserLoginResponse loginResponse = authService.login(request);
 
-            // Set refresh token vào cookie HttpOnly
-            Cookie refreshTokenCookie = new Cookie("refreshToken", loginResponse.getRefreshToken());
-            refreshTokenCookie.setHttpOnly(true);
-            refreshTokenCookie.setSecure(true); // Chỉ gửi qua HTTPS trong production
-            refreshTokenCookie.setPath("/");
-            refreshTokenCookie.setMaxAge(86400); // 1 ngày, khớp với refresh token expiration
-            refreshTokenCookie.setAttribute("SameSite", "Strict"); // Chống CSRF
-            response.addCookie(refreshTokenCookie);
+        // Set refresh token vào cookie HttpOnly
+        Cookie refreshTokenCookie = new Cookie("refreshToken", loginResponse.getRefreshToken());
+        refreshTokenCookie.setHttpOnly(true);
+        refreshTokenCookie.setSecure(false); // Tạm thời false để test trên localhost (không HTTPS)
+        refreshTokenCookie.setPath("/");
+        refreshTokenCookie.setMaxAge(7 * 24 * 60 * 60); // 7 ngày
+        refreshTokenCookie.setAttribute("SameSite", "Strict");
+        response.addCookie(refreshTokenCookie);
 
-            return returnSuccess(loginResponse);
+        return returnSuccess(loginResponse);
     }
 
     @Operation(
@@ -53,19 +52,34 @@ public class AuthController extends BaseController {
     )
     @PostMapping("/refresh-token")
     public ResponseEntity<BaseResponse<UserLoginResponse>> refreshToken(
-            @RequestBody RefreshTokenRequest request, HttpServletResponse response) {
-            UserLoginResponse refreshResponse = authService.refreshToken(request.getRefreshToken());
+            HttpServletRequest request, HttpServletResponse response) {
+        // Lấy refresh token từ cookie
+        String refreshToken = null;
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if ("refreshToken".equals(cookie.getName())) {
+                    refreshToken = cookie.getValue();
+                    break;
+                }
+            }
+        }
 
-            // Set refresh token mới vào cookie HttpOnly
-            Cookie refreshTokenCookie = new Cookie("refreshToken", refreshResponse.getRefreshToken());
-            refreshTokenCookie.setHttpOnly(true);
-            refreshTokenCookie.setSecure(true); // Chỉ gửi qua HTTPS trong production
-            refreshTokenCookie.setPath("/");
-            refreshTokenCookie.setMaxAge(86400); // 1 ngày, khớp với refresh token expiration
-            refreshTokenCookie.setAttribute("SameSite", "Strict"); // Chống CSRF
-            response.addCookie(refreshTokenCookie);
+        if (refreshToken == null) {
+            throw new RuntimeException("Refresh token not found in cookie");
+        }
 
-            return returnSuccess(refreshResponse);
+        UserLoginResponse refreshResponse = authService.refreshToken(refreshToken);
+
+        // Set refresh token mới vào cookie HttpOnly
+        Cookie refreshTokenCookie = new Cookie("refreshToken", refreshResponse.getRefreshToken());
+        refreshTokenCookie.setHttpOnly(true);
+        refreshTokenCookie.setSecure(false); // Tạm thời false để test trên localhost
+        refreshTokenCookie.setPath("/");
+        refreshTokenCookie.setMaxAge(7 * 24 * 60 * 60); // 7 ngày
+        refreshTokenCookie.setAttribute("SameSite", "Strict");
+        response.addCookie(refreshTokenCookie);
+
+        return returnSuccess(refreshResponse);
     }
 
     @Operation(
@@ -111,7 +125,8 @@ public class AuthController extends BaseController {
             // Xóa refresh token cookie
             Cookie cookie = new Cookie("refreshToken", null);
             cookie.setHttpOnly(true);
-            cookie.setSecure(true); // Chỉ gửi qua HTTPS trong production
+//            cookie.setSecure(true); // Chỉ gửi qua HTTPS trong production
+        cookie.setSecure(false); // Tạm thời false để test trên localhost
             cookie.setPath("/");
             cookie.setMaxAge(0); // Xóa cookie
             cookie.setAttribute("SameSite", "Strict");

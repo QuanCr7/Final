@@ -1,65 +1,59 @@
-// auth.js - Xử lý xác thực và trạng thái người dùng chung
-
-// Biến lưu trữ access token trong memory
+// /js/user/auth.js
+const API_BASE_URL = 'http://localhost:8080';
 let accessToken = null;
 
-/**
- * Kiểm tra trạng thái đăng nhập và thử refresh token nếu cần
- */
 async function checkLoginStatus() {
-    console.log('checkLoginStatus: Bắt đầu kiểm tra trạng thái đăng nhập');
+    console.log('auth.js: checkLoginStatus: Bắt đầu kiểm tra trạng thái đăng nhập');
     const username = localStorage.getItem('username');
-    console.log('checkLoginStatus: username từ localStorage:', username);
+    console.log('auth.js: checkLoginStatus: username từ localStorage:', username);
 
-    if (username && !accessToken) {
-        console.log('checkLoginStatus: Không có accessToken, thử refresh token');
+    if (username) {
+        console.log('auth.js: checkLoginStatus: Có username, thử làm mới token');
         try {
-            const response = await fetch('/auth/refresh-token', {
+            const response = await fetch(`${API_BASE_URL}/auth/refresh-token`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ refreshToken: '' }), // Cookie tự động gửi
                 credentials: 'include'
             });
 
             const data = await response.json();
-            console.log('checkLoginStatus: Response từ /auth/refresh-token:', data);
+            console.log('auth.js: checkLoginStatus: Response từ /auth/refresh-token:', JSON.stringify(data, null, 2));
 
-            if (response.ok) {
+            if (response.ok && data.data?.accessToken) {
                 accessToken = data.data.accessToken;
-                console.log('checkLoginStatus: Đã lấy accessToken mới:', accessToken);
+                console.log('auth.js: checkLoginStatus: Đã lấy accessToken mới:', accessToken);
                 updateHeaderAfterLogin(username);
+                return true;
             } else {
-                console.warn('checkLoginStatus: Refresh token thất bại, xóa dữ liệu xác thực');
+                console.warn('auth.js: checkLoginStatus: Làm mới token thất bại:', data.message || 'Không có accessToken');
+                showError(data.message || 'Phiên đăng nhập hết hạn, vui lòng đăng nhập lại');
                 clearAuthData();
                 resetHeaderAfterLogout();
+                return false;
             }
         } catch (error) {
-            console.error('checkLoginStatus: Lỗi khi refresh token:', error);
+            console.error('auth.js: checkLoginStatus: Lỗi khi làm mới token:', error);
+            showError('Lỗi kết nối khi làm mới phiên đăng nhập, vui lòng thử lại');
             clearAuthData();
             resetHeaderAfterLogout();
+            return false;
         }
-    } else if (username) {
-        console.log('checkLoginStatus: Có username, cập nhật header');
-        updateHeaderAfterLogin(username);
     } else {
-        console.log('checkLoginStatus: Không có username, reset header');
+        console.log('auth.js: checkLoginStatus: Không có username, reset header');
         resetHeaderAfterLogout();
+        return false;
     }
 }
 
-/**
- * Cập nhật header sau khi đăng nhập
- * @param {string} username - Tên người dùng
- */
 function updateHeaderAfterLogin(username) {
     const authSection = document.querySelector('.auth-section');
     if (!authSection) {
-        console.warn('updateHeaderAfterLogin: Không tìm thấy .auth-section');
-        return;
+        console.error('auth.js: updateHeaderAfterLogin: Không tìm thấy .auth-section trong DOM');
+        return false;
     }
-    console.log('updateHeaderAfterLogin: Cập nhật header cho username:', username);
+    console.log('auth.js: updateHeaderAfterLogin: Cập nhật header cho username:', username);
     authSection.innerHTML = `
         <div class="user-dropdown">
             <button class="user-btn">
@@ -79,34 +73,64 @@ function updateHeaderAfterLogin(username) {
     if (logoutBtn) {
         logoutBtn.addEventListener('click', function(e) {
             e.preventDefault();
+            console.log('auth.js: logoutBtn: Đã nhấn nút đăng xuất');
             logout();
         });
+        return true;
     } else {
-        console.warn('updateHeaderAfterLogin: Không tìm thấy logoutBtn');
+        console.error('auth.js: updateHeaderAfterLogin: Không tìm thấy logoutBtn sau khi cập nhật DOM');
+        return false;
     }
 }
 
-/**
- * Xử lý đăng xuất
- */
+function resetHeaderAfterLogout() {
+    const authSection = document.querySelector('.auth-section');
+    if (!authSection) {
+        console.error('auth.js: resetHeaderAfterLogout: Không tìm thấy .auth-section');
+        return false;
+    }
+    console.log('auth.js: resetHeaderAfterLogout: Reset header về trạng thái chưa đăng nhập');
+    authSection.innerHTML = `
+        <a href="/auth/login" class="auth-btn login-btn"><i class="fas fa-sign-in-alt"></i> Đăng nhập</a>
+        <a href="/auth/register" class="auth-btn register-btn"><i class="fas fa-user-plus"></i> Đăng ký</a>
+    `;
+    return true;
+}
+
+function clearAuthData() {
+    console.log('auth.js: clearAuthData: Xóa dữ liệu xác thực');
+    accessToken = null;
+    localStorage.removeItem('username');
+    localStorage.removeItem('rememberMe');
+    localStorage.removeItem('userData');
+}
+
 async function logout() {
-    console.log('logout: Bắt đầu đăng xuất');
+    console.log('auth.js: logout: Bắt đầu đăng xuất');
+    if (!accessToken) {
+        clearAuthData();
+        resetHeaderAfterLogout();
+        window.location.href = '/auth/login';
+        return;
+    }
+
     try {
-        const response = await fetch('/auth/logout', {
+        const response = await fetch(`${API_BASE_URL}/auth/logout`, {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${accessToken}`
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json'
             },
-            credentials: 'include' // Gửi cookie refreshToken
+            credentials: 'include'
         });
 
         if (response.ok) {
-            console.log('logout: Đăng xuất thành công');
+            console.log('auth.js: logout: Đăng xuất thành công');
         } else {
-            console.warn('logout: API logout trả về lỗi:', response.status);
+            console.warn('auth.js: logout: API logout trả về lỗi:', response.status);
         }
     } catch (error) {
-        console.error('logout: Lỗi khi gọi API logout:', error);
+        console.error('auth.js: Lỗi khi đăng xuất:', error);
     } finally {
         clearAuthData();
         resetHeaderAfterLogout();
@@ -114,54 +138,71 @@ async function logout() {
     }
 }
 
-/**
- * Xóa dữ liệu xác thực khỏi client
- */
-function clearAuthData() {
-    console.log('clearAuthData: Xóa dữ liệu xác thực');
-    accessToken = null;
-    localStorage.removeItem('username');
+function setAccessToken(token) {
+    console.log('auth.js: setAccessToken: Đặt accessToken:', token);
+    accessToken = token;
 }
 
-/**
- * Đặt lại header về trạng thái chưa đăng nhập
- */
-function resetHeaderAfterLogout() {
-    const authSection = document.querySelector('.auth-section');
-    if (!authSection) {
-        console.warn('resetHeaderAfterLogout: Không tìm thấy .auth-section');
-        return;
-    }
-    console.log('resetHeaderAfterLogout: Reset header về trạng thái chưa đăng nhập');
-    authSection.innerHTML = `
-        <a href="/auth/login" class="auth-btn login-btn"><i class="fas fa-sign-in-alt"></i> Đăng nhập</a>
-        <a href="/auth/register" class="auth-btn register-btn"><i class="fas fa-user-plus"></i> Đăng ký</a>
-    `;
-}
-
-/**
- * Lấy access token hiện tại
- * @returns {string|null} Access token hoặc null nếu không có
- */
 function getAccessToken() {
     return accessToken;
 }
 
-/**
- * Set access token
- * @param {string} token - Access token mới
- */
-function setAccessToken(token) {
-    console.log('setAccessToken: Đặt accessToken:', token);
-    accessToken = token;
+function showError(message) {
+    let errorElement = document.getElementById('errorMessage');
+    let errorTextElement = document.querySelector('.error-text');
+
+    if (!errorElement) {
+        const notification = document.createElement('div');
+        notification.style.cssText = `
+            position: fixed; top: 20px; right: 20px; padding: 15px; 
+            background-color: #dc3545; color: white; border-radius: 4px; 
+            z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        `;
+        notification.textContent = message;
+        document.body.appendChild(notification);
+        setTimeout(() => notification.remove(), 5000);
+        return;
+    }
+
+    if (errorTextElement) {
+        errorTextElement.textContent = message;
+    }
+    errorElement.style.display = 'flex';
+    setTimeout(() => {
+        errorElement.style.display = 'none';
+    }, 5000);
 }
 
-// Khởi tạo khi DOM được tải
+function showSuccess(message) {
+    let successElement = document.getElementById('successMessage');
+    let successTextElement = document.querySelector('.success-text');
+
+    if (!successElement) {
+        const notification = document.createElement('div');
+        notification.style.cssText = `
+            position: fixed; top: 20px; right: 20px; padding: 15px; 
+            background-color: #28a745; color: white; border-radius: 4px; 
+            z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        `;
+        notification.textContent = message;
+        document.body.appendChild(notification);
+        setTimeout(() => notification.remove(), 5000);
+        return;
+    }
+
+    if (successTextElement) {
+        successTextElement.textContent = message;
+    }
+    successElement.style.display = 'block';
+    setTimeout(() => {
+        successElement.style.display = 'none';
+    }, 5000);
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     console.log('auth.js: DOM loaded, chạy checkLoginStatus');
     checkLoginStatus();
 
-    // Xử lý menu mobile
     const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
     if (mobileMenuBtn) {
         mobileMenuBtn.addEventListener('click', function() {
@@ -169,7 +210,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Xử lý active menu
     const currentPath = window.location.pathname;
     const navLinks = document.querySelectorAll('.main-nav .nav-link');
     navLinks.forEach(link => {
