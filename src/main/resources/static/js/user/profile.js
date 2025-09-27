@@ -2,11 +2,22 @@
 document.addEventListener('DOMContentLoaded', async function() {
     const API_BASE_URL = 'http://localhost:8080';
 
-    // Kiểm tra trạng thái đăng nhập từ auth.js
     const isLoggedIn = await checkLoginStatus();
+    const loadingElement = document.getElementById('loading');
+    const errorElement = document.getElementById('errorMessage');
+    const errorTextElement = document.getElementById('errorText');
+
     if (!isLoggedIn) {
-        showError('Bạn cần đăng nhập để xem trang này');
-        setTimeout(() => window.location.href = '/auth/login', 2000);
+        console.log('profile.js: Chưa đăng nhập, hiển thị lỗi');
+        if (loadingElement) loadingElement.style.display = 'none'; // Ẩn spinner
+        if (errorElement && errorTextElement) {
+            errorElement.style.display = 'flex';
+            errorTextElement.textContent = 'Bạn cần đăng nhập để xem trang này!';
+            showError('Bạn cần đăng nhập để xem trang này!');
+        } else {
+            console.error('profile.js: Không tìm thấy errorMessage hoặc errorText trong DOM');
+            alert('Bạn cần đăng nhập để xem trang này!');
+        }
         return;
     }
 
@@ -25,7 +36,7 @@ async function loadUserProfile() {
             console.log('loadUserProfile: Không có accessToken, thử làm mới token');
             const refreshed = await checkLoginStatus();
             if (!refreshed) {
-                throw new Error('Bạn cần đăng nhập để xem trang này');
+                throw new Error('Bạn cần đăng nhập để xem trang này!');
             }
         }
 
@@ -43,17 +54,18 @@ async function loadUserProfile() {
 
         if (response.ok && data.code === 200) {
             displayUserProfile(data.data);
-            profileContent.style.display = 'block';
-            loadingElement.style.display = 'none';
+            if (profileContent) profileContent.style.display = 'block';
+            if (loadingElement) loadingElement.style.display = 'none';
         } else {
             throw new Error(data.message || 'Không thể lấy thông tin người dùng');
         }
     } catch (error) {
-        console.error('Lỗi:', error);
-        loadingElement.style.display = 'none';
-        errorElement.style.display = 'flex';
-        errorTextElement.textContent = error.message;
-        setTimeout(() => window.location.href = '/auth/login', 2000);
+        console.error('profile.js: Lỗi:', error);
+        if (loadingElement) loadingElement.style.display = 'none';
+        if (errorElement && errorTextElement) {
+            errorElement.style.display = 'flex';
+            errorTextElement.textContent = error.message;
+        }
     }
 }
 
