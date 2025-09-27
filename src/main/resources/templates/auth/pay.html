@@ -10,43 +10,7 @@
 </head>
 <body>
 <!-- Header -->
-<header class="main-header">
-    <div class="container">
-        <div class="header-content">
-            <div class="logo-container">
-                <a href="/" class="logo">
-                    <i class="fas fa-book-open logo-icon"></i>
-                    <span class="logo-text">BookStore</span>
-                </a>
-            </div>
-
-            <nav class="main-nav">
-                <ul class="nav-list">
-                    <li class="nav-item"><a href="/" class="nav-link active"><i class="fas fa-home"></i> Trang chủ</a></li>
-                    <li class="nav-item"><a href="/search" class="nav-link"><i class="fas fa-search"></i> Tìm kiếm</a></li>
-                    <li class="nav-item">
-                        <span class="nav-link"><i class="fas fa-tags"></i> Thể loại</span>
-                        <div class="categories-dropdown">
-                            <div class="categories-container">
-                                <!-- Nội dung sẽ được thêm bằng JavaScript -->
-                            </div>
-                        </div>
-                    </li>
-                    <li class="nav-item"><a href="/about" class="nav-link"><i class="fas fa-info-circle"></i> Giới thiệu</a></li>
-                </ul>
-            </nav>
-
-            <div class="auth-section">
-                <a href="/auth/login" class="auth-btn login-btn"><i class="fas fa-sign-in-alt"></i> Đăng nhập</a>
-                <a href="/auth/register" class="auth-btn register-btn"><i class="fas fa-user-plus"></i> Đăng ký</a>
-            </div>
-
-            <button class="mobile-menu-btn">
-                <i class="fas fa-bars"></i>
-            </button>
-        </div>
-    </div>
-</header>
+<div th:replace="~{guest/common/header :: header}"></div>
 
 <!-- Main Content -->
 <main class="main-content">
@@ -63,6 +27,14 @@
                     <h2 class="card-title">
                         <i class="fas fa-user"></i> Thông tin khách hàng
                     </h2>
+
+                    <div class="info-source">
+                        <label class="form-label" for="infoSource">Nguồn thông tin</label>
+                        <select id="infoSource" class="form-input">
+                            <option value="manual">Nhập thông tin mới</option>
+                            <option value="account">Sử dụng thông tin tài khoản</option>
+                        </select>
+                    </div>
 
                     <form id="customer-form">
                         <div class="form-group">
@@ -172,52 +144,7 @@
 </main>
 
 <!-- Footer -->
-<footer class="main-footer">
-    <div class="container">
-        <div class="footer-grid">
-            <div class="footer-col">
-                <h3 class="footer-title">Về BookStore</h3>
-                <p>Hệ thống quản lý và bán sách trực tuyến với nhiều thể loại đa dạng, phong phú.</p>
-                <div class="social-links">
-                    <a href="#"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#"><i class="fab fa-twitter"></i></a>
-                    <a href="#"><i class="fab fa-instagram"></i></a>
-                </div>
-            </div>
-
-            <div class="footer-col">
-                <h3 class="footer-title">Liên kết nhanh</h3>
-                <ul class="footer-links">
-                    <li><a href="/trangchu">Trang chủ</a></li>
-                    <li><a href="/books">Danh sách sách</a></li>
-                    <li><a href="/categories">Thể loại</a></li>
-                    <li><a href="/about">Giới thiệu</a></li>
-                </ul>
-            </div>
-
-            <div class="footer-col">
-                <h3 class="footer-title">Hỗ trợ</h3>
-                <ul class="footer-links">
-                    <li><a href="#">Trợ giúp</a></li>
-                    <li><a href="#">FAQ</a></li>
-                    <li><a href="#">Liên hệ</a></li>
-                    <li><a href="#">Chính sách bảo mật</a></li>
-                </ul>
-            </div>
-
-            <div class="footer-col">
-                <h3 class="footer-title">Liên hệ</h3>
-                <p><i class="fas fa-map-marker-alt"></i> 123 Đường Sách, Hà Nội</p>
-                <p><i class="fas fa-phone"></i> (024) 123 4567</p>
-                <p><i class="fas fa-envelope"></i> info@bookstore.vn</p>
-            </div>
-        </div>
-
-        <div class="footer-bottom">
-            <p>&copy; 2023 BookStore. All rights reserved.</p>
-        </div>
-    </div>
-</footer>
+<div th:replace="~{guest/common/footer :: footer}"></div>
 
 <script src="/js/user/auth.js" defer></script>
 <script src="/js/user/pay.js" defer></script>

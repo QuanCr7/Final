@@ -1,21 +1,111 @@
+// /js/user/pay.js
 // Biến toàn cục để lưu trữ giỏ hàng
 let checkoutCart = [];
 
-// Thêm script này vào trang thanh toán
-document.addEventListener('DOMContentLoaded', function() {
-    // Lấy dữ liệu giỏ hàng từ sessionStorage
-    checkoutCart = JSON.parse(sessionStorage.getItem('checkoutCart')) || [];
+document.addEventListener('DOMContentLoaded', async function() {
+    console.log('pay.js: DOM loaded');
 
-    if (checkoutCart.length === 0) {
-        // Nếu không có sách trong giỏ hàng, có thể chuyển hướng về trang chủ
-        alert('Giỏ hàng của bạn đang trống');
-        window.location.href = '/';
+    // Kiểm tra auth.js đã tải chưa
+    if (typeof checkLoginStatus === 'undefined' || typeof showError === 'undefined' || typeof getAccessToken === 'undefined') {
+        console.error('pay.js: auth.js functions (checkLoginStatus, showError, getAccessToken) are not defined');
+        alert('Lỗi hệ thống: Không thể tải auth.js. Vui lòng kiểm tra lại.');
         return;
     }
+
+    // Kiểm tra trạng thái đăng nhập
+    const isLoggedIn = await checkLoginStatus();
+    const infoSourceSelect = document.getElementById('infoSource');
+
+    // Nếu chưa đăng nhập, ẩn tùy chọn "Sử dụng thông tin tài khoản"
+    if (!isLoggedIn) {
+        console.log('pay.js: Chưa đăng nhập, ẩn tùy chọn sử dụng thông tin tài khoản');
+        infoSourceSelect.innerHTML = `
+            <option value="manual">Nhập thông tin mới</option>
+        `;
+    }
+
+    // Đồng bộ giỏ hàng từ sessionStorage và localStorage
+    checkoutCart = JSON.parse(sessionStorage.getItem('checkoutCart')) || JSON.parse(localStorage.getItem('cart')) || [];
+    if (checkoutCart.length === 0) {
+        console.log('pay.js: Giỏ hàng trống, chuyển hướng về trang chủ');
+        showError('Giỏ hàng của bạn đang trống');
+        setTimeout(() => window.location.href = '/', 2000);
+        return;
+    }
+
+    // Lưu giỏ hàng vào sessionStorage để đảm bảo không mất khi reload
+    sessionStorage.setItem('checkoutCart', JSON.stringify(checkoutCart));
 
     // Hiển thị sách từ giỏ hàng
     renderCartItems(checkoutCart);
     calculateTotal(checkoutCart);
+
+    // Các trường nhập liệu
+    const fields = {
+        fullname: document.getElementById('fullname'),
+        email: document.getElementById('email'),
+        phone: document.getElementById('phone'),
+        address: document.getElementById('address'),
+        city: document.getElementById('city'),
+        district: document.getElementById('district')
+    };
+
+    // Xử lý dropdown nguồn thông tin
+    infoSourceSelect.addEventListener('change', async function() {
+        const value = this.value;
+        console.log('pay.js: infoSource changed to:', value);
+
+        // Khóa hoặc mở khóa các trường
+        const disableFields = value === 'account';
+        Object.values(fields).forEach(field => {
+            if (field) field.disabled = disableFields;
+        });
+
+        if (value === 'account' && isLoggedIn) {
+            try {
+                const response = await fetch('http://localhost:8080/account/profile', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${getAccessToken()}`,
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include'
+                });
+
+                const data = await response.json();
+                console.log('pay.js: Profile response:', JSON.stringify(data, null, 2));
+
+                if (response.ok && data.code === 200) {
+                    const { fullName, email, phone, address } = data.data;
+                    document.getElementById('fullname').value = fullName || '';
+                    document.getElementById('email').value = email || '';
+                    document.getElementById('phone').value = phone || '';
+                    document.getElementById('address').value = address || '';
+                    // city và district không có trong API, để trống
+                    document.getElementById('city').value = '';
+                    document.getElementById('district').value = '';
+                } else {
+                    showError(data.message || 'Không thể lấy thông tin tài khoản');
+                    infoSourceSelect.value = 'manual';
+                    Object.values(fields).forEach(field => {
+                        if (field) field.disabled = false;
+                    });
+                }
+            } catch (error) {
+                console.error('pay.js: Lỗi khi lấy thông tin tài khoản:', error);
+                showError('Lỗi khi lấy thông tin tài khoản: ' + error.message);
+                infoSourceSelect.value = 'manual';
+                Object.values(fields).forEach(field => {
+                    if (field) field.disabled = false;
+                });
+            }
+        } else {
+            // Xóa các trường để người dùng nhập mới
+            Object.values(fields).forEach(field => {
+                if (field) field.value = '';
+            });
+        }
+    });
 
     // Gán sự kiện cho nút thanh toán
     document.getElementById('completeOrderBtn').addEventListener('click', completeOrder);
@@ -29,15 +119,15 @@ function renderCartItems(cartItems) {
         const bookItem = document.createElement('div');
         bookItem.className = 'book-item';
         bookItem.innerHTML = `
-                <img src="${item.image}" alt="${item.title}" class="book-image">
-                <div class="book-details">
-                    <h3 class="book-title">${item.title}</h3>
-                    <p class="book-price">${formatPrice(item.price)}</p>
-                    <div class="book-quantity">
-                        <span>Số lượng: ${item.quantity}</span>
-                    </div>
+            <img src="${item.image}" alt="${item.title}" class="book-image">
+            <div class="book-details">
+                <h3 class="book-title">${item.title}</h3>
+                <p class="book-price">${formatPrice(item.price)}</p>
+                <div class="book-quantity">
+                    <span>Số lượng: ${item.quantity}</span>
                 </div>
-            `;
+            </div>
+        `;
         bookItemsContainer.appendChild(bookItem);
     });
 }
@@ -59,35 +149,45 @@ function formatPrice(price) {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
 }
 
-function completeOrder(e) {
+async function completeOrder(e) {
     e.preventDefault();
+    console.log('pay.js: completeOrder: Bắt đầu xử lý đơn hàng');
+
+    // Kiểm tra đăng nhập
+    const isLoggedIn = await checkLoginStatus();
 
     // Basic form validation
-    const fullname = document.getElementById('fullname').value;
-    const email = document.getElementById('email').value;
-    const phone = document.getElementById('phone').value;
-    const address = document.getElementById('address').value;
+    const fields = {
+        fullname: document.getElementById('fullname'),
+        email: document.getElementById('email'),
+        phone: document.getElementById('phone'),
+        address: document.getElementById('address'),
+        city: document.getElementById('city'),
+        district: document.getElementById('district')
+    };
     const paymentMethod = document.querySelector('input[name="payment-method"]:checked').value;
 
-    if (!fullname || !email || !phone || !address) {
-        alert('Vui lòng điền đầy đủ thông tin khách hàng');
+    if (!fields.fullname.value || !fields.email.value || !fields.phone.value || !fields.address.value || !fields.city.value || !fields.district.value) {
+        showError('Vui lòng điền đầy đủ thông tin khách hàng');
+        console.log('pay.js: completeOrder: Thiếu thông tin khách hàng');
         return;
     }
 
     if (checkoutCart.length === 0) {
-        alert('Giỏ hàng của bạn đang trống');
+        showError('Giỏ hàng của bạn đang trống');
+        console.log('pay.js: completeOrder: Giỏ hàng trống');
         return;
     }
 
     // Tạo đối tượng đơn hàng
     const order = {
         customerInfo: {
-            fullname,
-            email,
-            phone,
-            address,
-            city: document.getElementById('city').value,
-            district: document.getElementById('district').value
+            fullname: fields.fullname.value,
+            email: fields.email.value,
+            phone: fields.phone.value,
+            address: fields.address.value,
+            city: fields.city.value,
+            district: fields.district.value
         },
         paymentMethod,
         items: checkoutCart,
@@ -95,8 +195,36 @@ function completeOrder(e) {
         total: calculateOrderTotal(checkoutCart)
     };
 
-    // Gửi đơn hàng đến server (trong thực tế)
-    submitOrder(order);
+    // Gửi đơn hàng đến server
+    try {
+        const response = await fetch('http://localhost:8080/orders', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                ...(isLoggedIn && { 'Authorization': `Bearer ${getAccessToken()}` })
+            },
+            credentials: 'include',
+            body: JSON.stringify(order)
+        });
+
+        const data = await response.json();
+        console.log('pay.js: Order response:', JSON.stringify(data, null, 2));
+
+        if (response.ok && data.code === 200) {
+            // Hiển thị thông báo thành công
+            alert('Đơn hàng của bạn đã được đặt thành công! Cảm ơn bạn đã mua sắm tại BookStore.');
+            // Xóa giỏ hàng sau khi đặt hàng thành công
+            localStorage.removeItem('cart');
+            sessionStorage.removeItem('checkoutCart');
+            // Chuyển hướng về trang chủ
+            window.location.href = '/';
+        } else {
+            showError(data.message || 'Không thể đặt đơn hàng');
+        }
+    } catch (error) {
+        console.error('pay.js: Lỗi khi đặt đơn hàng:', error);
+        showError('Lỗi khi đặt đơn hàng: ' + error.message);
+    }
 }
 
 function calculateOrderTotal(cartItems) {
@@ -104,19 +232,4 @@ function calculateOrderTotal(cartItems) {
     const shipping = 20000;
     const discount = subtotal > 100000 ? 10000 : 0;
     return subtotal + shipping - discount;
-}
-
-function submitOrder(order) {
-    // Trong thực tế, bạn sẽ gửi API request đến server
-    console.log('Đơn hàng:', order);
-
-    // Hiển thị thông báo thành công
-    alert('Đơn hàng của bạn đã được đặt thành công! Cảm ơn bạn đã mua sắm tại BookStore.');
-
-    // Xóa giỏ hàng sau khi đặt hàng thành công
-    localStorage.removeItem('cart'); // Xóa giỏ hàng từ localStorage
-    sessionStorage.removeItem('checkoutCart'); // Xóa giỏ hàng tạm thời
-
-    // Chuyển hướng về trang chủ
-    window.location.href = '/';
 }
