@@ -1,8 +1,6 @@
 package com.example.website.configuration;
 
 import com.example.website.entity.RoleEntity;
-import com.example.website.service.AuthService;
-import com.example.website.service.UserService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -46,6 +44,7 @@ public class JwtTokenProvider {
     private String buildToken(CustomUserDetails user, long expiration) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("role", user.getUserEntity().getRoles().stream().map(RoleEntity::getRole).toList());
+        claims.put("userId", user.getId()); // Thêm userId vào claims
 
         return Jwts.builder()
                 .setClaims(claims)
@@ -58,6 +57,8 @@ public class JwtTokenProvider {
 
     public String generateToken(CustomUserDetails user) {
         Map<String, Object> claims = new HashMap<>();
+        claims.put("role", user.getUserEntity().getRoles().stream().map(RoleEntity::getRole).toList());
+        claims.put("userId", user.getId());
         var expirationThirtyMinutes = new Date(System.currentTimeMillis() + 1000 * jwtExpirationDate);
 
         return Jwts.builder()
@@ -98,6 +99,10 @@ public class JwtTokenProvider {
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
+    }
+
+    public Integer extractUserId(String token) {
+        return extractClaim(token, claims -> claims.get("userId", Integer.class));
     }
 
     public Date extractExpiration(String token) {

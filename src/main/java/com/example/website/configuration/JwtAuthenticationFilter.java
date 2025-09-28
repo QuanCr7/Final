@@ -31,26 +31,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(@NonNull HttpServletRequest request,
                                     @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain) throws ServletException, IOException {
-//        // Get JWT token from HTTP request
-//        String token = getTokenFromRequest(request);
-//
-//        // Kiểm tra token có trong blacklist không
-//        if (StringUtils.hasText(token) && authServiceImpl.isBlacklisted(token)) {
-//            filterChain.doFilter(request, response);
-//            return;
-//        }
-//
-//        // Validate Token
-//        if (StringUtils.hasText(token) && !jwtTokenProvider.isTokenExpired(token)) {
-//            String username = jwtTokenProvider.extractUsername(token);
-//            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-//
-//            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-//            authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-//            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-//        }
-//
-//        filterChain.doFilter(request, response);
         try {
             // Lấy token từ header Authorization
             String token = getTokenFromRequest(request);
@@ -66,14 +46,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // Kiểm tra và xác thực token
             if (StringUtils.hasText(token) && !jwtTokenProvider.isTokenExpired(token)) {
                 String username = jwtTokenProvider.extractUsername(token);
+                Integer userId = jwtTokenProvider.extractUserId(token);
                 if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                     UserDetails userDetails = userDetailsService.loadUserByUsername(username);
                     if (userDetails != null) {
                         UsernamePasswordAuthenticationToken authenticationToken =
-                                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                                new UsernamePasswordAuthenticationToken(
+                                        userDetails,
+                                        null,
+                                        userDetails.getAuthorities()
+                                );
                         authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-                        log.info("Authenticated user: {}", username);
+                        log.info("Authenticated user: {}, userId: {}", username, userId);
                     } else {
                         log.warn("UserDetails not found for username: {}", username);
                     }
