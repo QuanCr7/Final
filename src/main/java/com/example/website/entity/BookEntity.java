@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
@@ -25,8 +26,8 @@ public class BookEntity {
     private String title;
     @Column(nullable = false)
     private String author;
-    @Column(nullable = false)
-    private double price;
+    @Column(precision = 19, scale = 3)
+    private BigDecimal price;
     @Column(nullable = false)
     private String description;
     @Column(nullable = false)

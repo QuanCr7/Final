@@ -25,7 +25,7 @@ public class OrderEntity {
     @Column(name = "order_date")
     private LocalDateTime orderDate;
 
-    @Column(name = "total_amount", precision = 19, scale = 2)
+    @Column(name = "total_amount", precision = 19, scale = 3)
     private BigDecimal totalAmount;
 
     @Column(name = "shipping_Address")

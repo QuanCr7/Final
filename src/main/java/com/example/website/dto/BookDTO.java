@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -16,7 +17,7 @@ import java.util.Set;
 public class BookDTO {
     private String title;
     private String author;
-    private double price;
+    private BigDecimal price;
     private String description;
     private String publisher;
     private MultipartFile[] images = new MultipartFile[0];

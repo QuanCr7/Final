@@ -1,11 +1,13 @@
 package com.example.website.service;
 
-import com.example.website.dto.OrderDetailDTO;
+import com.example.website.request.OrderDetailRequest;
 import com.example.website.entity.OrderDetailEntity;
+import com.example.website.response.OrderDetailResponse;
 
 import java.util.List;
 
 public interface OrderDetailService {
-    List<OrderDetailEntity> addBookToOrder(OrderDetailDTO orderDetailDTO);
-    List<OrderDetailEntity> RemoveBookFromOrder(OrderDetailDTO orderDetailDTO);
+    List<OrderDetailResponse> add(OrderDetailRequest orderDetailRequest);
+    List<OrderDetailResponse> getOrderDetailByOrderId(int orderId);
+    List<OrderDetailEntity> RemoveBookFromOrder(OrderDetailRequest orderDetailRequest);
 }

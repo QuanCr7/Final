@@ -22,7 +22,7 @@ public class OrderDetailEntity {
     @Column(nullable = false)
     private int quantity;
 
-    @Column(precision = 19, scale = 2)
+    @Column(precision = 19, scale = 3)
     private BigDecimal price;
 
     @ManyToOne(fetch = FetchType.LAZY)
