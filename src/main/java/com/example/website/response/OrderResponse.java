@@ -15,6 +15,9 @@ import java.util.List;
 public class OrderResponse {
     private int id;
     private LocalDateTime orderDate;
+    private String name;
+    private String email;
+    private String phone;
     private BigDecimal totalAmount;
     private String shippingAddress;
     private OrderStatus status;

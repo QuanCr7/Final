@@ -4,7 +4,7 @@ let checkoutCart = [];
 
 document.addEventListener('DOMContentLoaded', async function() {
     console.log('pay.js: DOM loaded');
-
+    
     // Kiểm tra auth.js đã tải chưa
     if (typeof checkLoginStatus === 'undefined' || typeof showError === 'undefined' || typeof getAccessToken === 'undefined') {
         console.error('pay.js: auth.js functions (checkLoginStatus, showError, getAccessToken) are not defined');
@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     // Các trường nhập liệu
     const fields = {
-        fullname: document.getElementById('fullname'),
+        name: document.getElementById('name'),
         email: document.getElementById('email'),
         phone: document.getElementById('phone'),
         address: document.getElementById('address')
@@ -74,8 +74,8 @@ document.addEventListener('DOMContentLoaded', async function() {
                 console.log('pay.js: Profile response:', JSON.stringify(data, null, 2));
 
                 if (response.ok && data.code === 200) {
-                    const { fullName, email, phone, address } = data.data;
-                    fields.fullname.value = fullName || '';
+                    const { name, email, phone, address } = data.data;
+                    fields.name.value = name || '';
                     fields.email.value = email || '';
                     fields.phone.value = phone || '';
                     fields.address.value = address || '';
@@ -157,13 +157,13 @@ async function completeOrder(e) {
 
     // Basic form validation
     const fields = {
-        fullname: document.getElementById('fullname'),
+        name: document.getElementById('name'),
         email: document.getElementById('email'),
         phone: document.getElementById('phone'),
         address: document.getElementById('address')
     };
 
-    if (!fields.fullname.value || !fields.email.value || !fields.phone.value || !fields.address.value) {
+    if (!fields.name.value || !fields.email.value || !fields.phone.value || !fields.address.value) {
         showError('Vui lòng điền đầy đủ thông tin khách hàng');
         console.log('pay.js: completeOrder: Thiếu thông tin khách hàng');
         return;
@@ -178,6 +178,9 @@ async function completeOrder(e) {
     // Tạo đối tượng đơn hàng khớp với OrderRequest
     const order = {
         shippingAddress: fields.address.value, // Gộp toàn bộ địa chỉ vào shippingAddress
+        name: fields.name.value,
+        email: fields.email.value,
+        phone: fields.phone.value,
         totalAmount: calculateOrderTotal(checkoutCart),
         orderDate: new Date().toISOString(),
         orderDetails: checkoutCart.map(item => ({

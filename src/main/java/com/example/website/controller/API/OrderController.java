@@ -3,6 +3,7 @@ package com.example.website.controller.API;
 import com.example.website.request.OrderRequest;
 import com.example.website.response.BaseResponse;
 import com.example.website.response.OrderResponse;
+import com.example.website.response.PageOrderResponse;
 import com.example.website.service.impl.OrderServiceImpl;
 import com.example.website.utils.OrderStatus;
 import jakarta.validation.Valid;
@@ -16,9 +17,21 @@ import org.springframework.web.bind.annotation.*;
 public class OrderController extends BaseController {
     private final OrderServiceImpl orderServiceImpl;
 
+    @GetMapping("/all")
+    public ResponseEntity<BaseResponse<PageOrderResponse>> getAllOrder(
+            @RequestParam(defaultValue = "1") int page) {
+        return returnSuccess(orderServiceImpl.findAll(page));
+    }
+
     @GetMapping("/detail/{id}")
     public ResponseEntity<BaseResponse<OrderResponse>> display(@PathVariable("id") Integer id) {
         return returnSuccess(orderServiceImpl.getById(id));
+    }
+
+    @GetMapping("/user")
+    public ResponseEntity<BaseResponse<PageOrderResponse>> displayByUser(
+            @RequestParam(defaultValue = "1") int page) {
+        return returnSuccess(orderServiceImpl.getAllOrdersByUserId(page));
     }
 
     @PostMapping("/pay")

@@ -13,6 +13,9 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderRequest {
+    private String name;
+    private String phone;
+    private String email;
     private LocalDateTime orderDate;
     private BigDecimal totalAmount;
     private OrderStatus status;

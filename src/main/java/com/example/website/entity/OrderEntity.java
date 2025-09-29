@@ -25,6 +25,14 @@ public class OrderEntity {
     @Column(name = "order_date")
     private LocalDateTime orderDate;
 
+    private String name;
+
+    @Column(nullable = false)
+    private String email;
+
+    @Column(nullable = false)
+    private String phone;
+
     @Column(name = "total_amount", precision = 19, scale = 3)
     private BigDecimal totalAmount;
 

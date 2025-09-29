@@ -11,11 +11,15 @@ import com.example.website.request.OrderDetailRequest;
 import com.example.website.request.OrderRequest;
 import com.example.website.response.OrderDetailResponse;
 import com.example.website.response.OrderResponse;
+import com.example.website.response.PageOrderResponse;
 import com.example.website.service.OrderDetailService;
 import com.example.website.service.OrderService;
 import com.example.website.utils.OrderStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -32,22 +36,53 @@ public class OrderServiceImpl implements OrderService {
     private final OrderDetailService orderDetailService;
     private final OrderDetailRepository orderDetailRepository;
 
+    private static final int size = 10;
+
+    @Override
+    public PageOrderResponse findAll(Integer page) {
+        int pageNumber = (page == null) ? 0 : page - 1;
+        Pageable pageable = PageRequest.of(pageNumber, size);
+
+        Page<OrderEntity> orderEntities = orderRepository.findAll(pageable);
+        Page<OrderResponse> responsePage = orderEntities.map(this::response);
+
+        return PageOrderResponse.builder()
+                .currentPage(pageNumber + 1)
+                .pageSize(responsePage.getSize())
+                .totalPages(responsePage.getTotalPages())
+                .totalElements(responsePage.getTotalElements())
+                .orders(responsePage.getContent())
+                .build();
+    }
+
     @Override
     public OrderResponse getById(int id) {
         return response(orderRepository.findById(id).orElseThrow(()-> new RuntimeException("Order Not Found")));
     }
 
     @Override
-    public List<OrderEntity> getByUserId(int userId) {
-        if (!userRepository.existsById(userId)) {
-            throw new RuntimeException("User Not Found");
+    public PageOrderResponse getAllOrdersByUserId(Integer page) {
+
+        // Lấy userId từ SecurityContext
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Integer userId = userDetails.getId();
+        if (userId == null) {
+            throw new RuntimeException("User not authenticated");
         }
 
-        List<OrderEntity> orders = orderRepository.findByUserId(userId);
-        if (orders.isEmpty()) {
-            throw new RuntimeException("Order Not Found");
-        }
-        return orders;
+        int pageNumber = (page == null) ? 0 : page - 1;
+        Pageable pageable = PageRequest.of(pageNumber, size);
+
+        Page<OrderEntity> orderEntities = orderRepository.findByUserId(userId, pageable);
+        Page<OrderResponse> responsePage = orderEntities.map(this::response);
+
+        return PageOrderResponse.builder()
+                .currentPage(pageNumber + 1)
+                .pageSize(responsePage.getSize())
+                .totalPages(responsePage.getTotalPages())
+                .totalElements(responsePage.getTotalElements())
+                .orders(responsePage.getContent())
+                .build();
     }
 
     @Override
@@ -66,6 +101,9 @@ public class OrderServiceImpl implements OrderService {
 
         OrderEntity order = OrderEntity.builder()
                 .orderDate(LocalDateTime.now())
+                .name(request.getName())
+                .email(request.getEmail())
+                .phone(request.getPhone())
                 .totalAmount(request.getTotalAmount())
                 .shippingAddress(request.getShippingAddress())
                 .status(OrderStatus.PENDING)
@@ -118,6 +156,9 @@ public class OrderServiceImpl implements OrderService {
                 .id(order.getId())
                 .shippingAddress(order.getShippingAddress())
                 .orderDate(order.getOrderDate())
+                .name(order.getName())
+                .email(order.getEmail())
+                .phone(order.getPhone())
                 .status(order.getStatus())
                 .totalAmount(order.getTotalAmount())
                 .userId(order.getUser().getId())
