@@ -45,9 +45,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         fullname: document.getElementById('fullname'),
         email: document.getElementById('email'),
         phone: document.getElementById('phone'),
-        address: document.getElementById('address'),
-        city: document.getElementById('city'),
-        district: document.getElementById('district')
+        address: document.getElementById('address')
     };
 
     // Xử lý dropdown nguồn thông tin
@@ -77,13 +75,10 @@ document.addEventListener('DOMContentLoaded', async function() {
 
                 if (response.ok && data.code === 200) {
                     const { fullName, email, phone, address } = data.data;
-                    document.getElementById('fullname').value = fullName || '';
-                    document.getElementById('email').value = email || '';
-                    document.getElementById('phone').value = phone || '';
-                    document.getElementById('address').value = address || '';
-                    // city và district không có trong API, để trống
-                    document.getElementById('city').value = '';
-                    document.getElementById('district').value = '';
+                    fields.fullname.value = fullName || '';
+                    fields.email.value = email || '';
+                    fields.phone.value = phone || '';
+                    fields.address.value = address || '';
                 } else {
                     showError(data.message || 'Không thể lấy thông tin tài khoản');
                     infoSourceSelect.value = 'manual';
@@ -155,19 +150,20 @@ async function completeOrder(e) {
 
     // Kiểm tra đăng nhập
     const isLoggedIn = await checkLoginStatus();
+    if (!isLoggedIn) {
+        showError('Bạn cần đăng nhập để đặt hàng');
+        return;
+    }
 
     // Basic form validation
     const fields = {
         fullname: document.getElementById('fullname'),
         email: document.getElementById('email'),
         phone: document.getElementById('phone'),
-        address: document.getElementById('address'),
-        city: document.getElementById('city'),
-        district: document.getElementById('district')
+        address: document.getElementById('address')
     };
-    const paymentMethod = document.querySelector('input[name="payment-method"]:checked').value;
 
-    if (!fields.fullname.value || !fields.email.value || !fields.phone.value || !fields.address.value || !fields.city.value || !fields.district.value) {
+    if (!fields.fullname.value || !fields.email.value || !fields.phone.value || !fields.address.value) {
         showError('Vui lòng điền đầy đủ thông tin khách hàng');
         console.log('pay.js: completeOrder: Thiếu thông tin khách hàng');
         return;
@@ -179,29 +175,25 @@ async function completeOrder(e) {
         return;
     }
 
-    // Tạo đối tượng đơn hàng
+    // Tạo đối tượng đơn hàng khớp với OrderRequest
     const order = {
-        customerInfo: {
-            fullname: fields.fullname.value,
-            email: fields.email.value,
-            phone: fields.phone.value,
-            address: fields.address.value,
-            city: fields.city.value,
-            district: fields.district.value
-        },
-        paymentMethod,
-        items: checkoutCart,
+        shippingAddress: fields.address.value, // Gộp toàn bộ địa chỉ vào shippingAddress
+        totalAmount: calculateOrderTotal(checkoutCart),
         orderDate: new Date().toISOString(),
-        total: calculateOrderTotal(checkoutCart)
+        orderDetails: checkoutCart.map(item => ({
+            bookId: item.id, // Giả định item.id là bookId
+            quantity: item.quantity,
+            price: item.price
+        }))
     };
 
     // Gửi đơn hàng đến server
     try {
-        const response = await fetch('http://localhost:8080/orders', {
+        const response = await fetch('http://localhost:8080/order/pay', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                ...(isLoggedIn && { 'Authorization': `Bearer ${getAccessToken()}` })
+                'Authorization': `Bearer ${getAccessToken()}`
             },
             credentials: 'include',
             body: JSON.stringify(order)
