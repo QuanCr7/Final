@@ -1,7 +1,6 @@
 // /js/user/profile.js
+const API_BASE_URL = 'http://localhost:8080';
 document.addEventListener('DOMContentLoaded', async function() {
-    const API_BASE_URL = 'http://localhost:8080';
-
     const isLoggedIn = await checkLoginStatus();
     const loadingElement = document.getElementById('loading');
     const errorElement = document.getElementById('errorMessage');
@@ -9,7 +8,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     if (!isLoggedIn) {
         console.log('profile.js: Chưa đăng nhập, hiển thị lỗi');
-        if (loadingElement) loadingElement.style.display = 'none'; // Ẩn spinner
+        if (loadingElement) loadingElement.style.display = 'none';
         if (errorElement && errorTextElement) {
             errorElement.style.display = 'flex';
             errorTextElement.textContent = 'Bạn cần đăng nhập để xem trang này!';
@@ -21,8 +20,9 @@ document.addEventListener('DOMContentLoaded', async function() {
         return;
     }
 
-    // Nếu đã đăng nhập, tải profile
+    // Nếu đã đăng nhập, tải profile và số lần đặt hàng
     loadUserProfile();
+    loadOrderCount();
 });
 
 async function loadUserProfile() {
@@ -66,6 +66,37 @@ async function loadUserProfile() {
             errorElement.style.display = 'flex';
             errorTextElement.textContent = error.message;
         }
+    }
+}
+
+async function loadOrderCount() {
+    const booksBoughtElement = document.getElementById('booksBought');
+    try {
+        const response = await fetch(`${API_BASE_URL}/order/user?page=1`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${getAccessToken()}`,
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include'
+        });
+
+        const data = await response.json();
+        console.log('Order count response:', JSON.stringify(data, null, 2));
+
+        if (response.ok && data.code === 200) {
+            booksBoughtElement.textContent = data.data.totalElements || 0;
+            // Thêm sự kiện click để chuyển hướng đến trang order
+            booksBoughtElement.parentElement.style.cursor = 'pointer';
+            booksBoughtElement.parentElement.addEventListener('click', () => {
+                window.location.href = '/me/order';
+            });
+        } else {
+            throw new Error(data.message || 'Không thể lấy số lần đặt hàng');
+        }
+    } catch (error) {
+        console.error('profile.js: Lỗi khi lấy số lần đặt hàng:', error);
+        booksBoughtElement.textContent = '0';
     }
 }
 

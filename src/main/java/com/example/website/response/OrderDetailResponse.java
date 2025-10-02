@@ -14,4 +14,7 @@ public class OrderDetailResponse {
     private String book;
     private BigDecimal price;
     private int quantity;
+    private String title;
+    private String author;
+    private String imageUrl;
 }

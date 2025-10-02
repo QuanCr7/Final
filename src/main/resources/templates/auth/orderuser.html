@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BookStore - Lịch sử đơn hàng</title>
+    <link rel="stylesheet" href="/css/headandfoot.css">
+    <link rel="stylesheet" href="/css/shopping.css">
+    <link rel="stylesheet" href="/css/user/orderuser.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<!-- Header -->
+<div th:replace="~{guest/common/header :: header}"></div>
+
+<!-- Main Content -->
+<main class="main-content">
+    <div class="container">
+        <!-- Orders Section -->
+        <section class="orders-section">
+            <div class="section-header">
+                <h2 class="section-title"><i class="fas fa-shopping-cart"></i> Lịch sử đơn hàng</h2>
+            </div>
+
+            <div id="loading" class="loading">
+                <div class="spinner"></div>
+                <p>Đang tải danh sách đơn hàng...</p>
+            </div>
+
+            <div id="errorMessage" class="error-message" style="display: none;">
+                <i class="fas fa-exclamation-circle"></i>
+                <span id="errorText"></span>
+            </div>
+
+            <div id="ordersContent" style="display: none;">
+                <div class="orders-container">
+                    <table class="orders-table">
+                        <thead>
+                        <tr>
+                            <th>Mã đơn hàng</th>
+                            <th>Ngày đặt</th>
+                            <th>Địa chỉ giao hàng</th>
+                            <th>Email</th>
+                            <th>Số điện thoại</th>
+                            <th>Tổng tiền</th>
+                            <th>Trạng thái</th>
+                            <th>Chi tiết</th>
+                        </tr>
+                        </thead>
+                        <tbody id="ordersTableBody"></tbody>
+                    </table>
+
+                    <!-- Pagination -->
+                    <div class="pagination-container">
+                        <div id="pagination" class="pagination"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</main>
+
+<!-- Footer -->
+<div th:replace="~{guest/common/footer :: footer}"></div>
+
+<script src="/js/user/auth.js" defer></script>
+<script src="/js/user/orderuser.js" defer></script>
+<script src="/js/shopping.js" defer></script>
+<script src="/js/categories.js" defer></script>
+</body>
+</html>

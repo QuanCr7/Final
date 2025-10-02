@@ -55,10 +55,13 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 
     public OrderDetailResponse response(OrderDetailEntity orderDetail) {
         return OrderDetailResponse.builder()
-                .id(orderDetail.getId())
+                .id(orderDetail.getBook().getId())
                 .price(orderDetail.getPrice())
                 .quantity(orderDetail.getQuantity())
                 .book(orderDetail.getBook().getTitle())
+                .title(orderDetail.getBook().getTitle())
+                .author(orderDetail.getBook().getAuthor())
+                .imageUrl(orderDetail.getBook().getImages().getFirst())
                 .build();
     }
 
