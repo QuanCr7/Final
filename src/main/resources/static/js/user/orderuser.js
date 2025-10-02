@@ -1,12 +1,13 @@
 // /js/user/orderuser.js
-const API_BASE_URL = 'http://localhost:8080';
 document.addEventListener('DOMContentLoaded', async function() {
+    const API_BASE_URL = 'http://localhost:8080';
     let currentPage = 1;
 
     const isLoggedIn = await checkLoginStatus();
     const loadingElement = document.getElementById('loading');
     const errorElement = document.getElementById('errorMessage');
     const errorTextElement = document.getElementById('errorText');
+    const ordersContent = document.getElementById('ordersContent');
 
     if (!isLoggedIn) {
         console.log('orderuser.js: Chưa đăng nhập, hiển thị lỗi');
@@ -46,6 +47,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 });
 
 async function loadOrders(page, updateUrlFlag = true) {
+    const API_BASE_URL = 'http://localhost:8080';
     const loadingElement = document.getElementById('loading');
     const errorElement = document.getElementById('errorMessage');
     const errorTextElement = document.getElementById('errorText');

@@ -1,7 +1,6 @@
 // /js/user/orderdetail.js
-const API_BASE_URL = 'http://localhost:8080';
 document.addEventListener('DOMContentLoaded', async function() {
-    
+    const API_BASE_URL = 'http://localhost:8080';
     const urlParams = new URLSearchParams(window.location.search);
     let orderId = urlParams.get('id');
 
@@ -9,6 +8,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     const loadingElement = document.getElementById('loading');
     const errorElement = document.getElementById('errorMessage');
     const errorTextElement = document.getElementById('errorText');
+    const orderContent = document.getElementById('orderContent');
 
     if (!isLoggedIn) {
         console.log('order-detail.js: Chưa đăng nhập, hiển thị lỗi');
@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 });
 
 async function loadOrderDetail(orderId) {
-    
+    const API_BASE_URL = 'http://localhost:8080';
     const loadingElement = document.getElementById('loading');
     const errorElement = document.getElementById('errorMessage');
     const errorTextElement = document.getElementById('errorText');
@@ -153,7 +153,7 @@ function getStatusText(status) {
 }
 
 async function reorder(orderId) {
-    
+    const API_BASE_URL = 'http://localhost:8080';
     try {
         const response = await fetch(`${API_BASE_URL}/order/detail/${orderId}`, {
             method: 'GET',

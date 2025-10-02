@@ -1,6 +1,7 @@
 // /js/user/profile.js
-const API_BASE_URL = 'http://localhost:8080';
 document.addEventListener('DOMContentLoaded', async function() {
+    const API_BASE_URL = 'http://localhost:8080';
+
     const isLoggedIn = await checkLoginStatus();
     const loadingElement = document.getElementById('loading');
     const errorElement = document.getElementById('errorMessage');
