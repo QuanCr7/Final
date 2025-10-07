@@ -1,17 +1,16 @@
 package com.example.website.service;
 
 
-import com.example.website.dto.CommentDTO;
 import com.example.website.entity.CommentEntity;
-
-import java.util.List;
+import com.example.website.request.CommentRequest;
+import com.example.website.response.CommentResponse;
+import com.example.website.response.PageCommentResponse;
 
 public interface CommentService {
-    List<CommentEntity> findAll();
-    List<CommentEntity> findAllByBook(String name);
+    PageCommentResponse findAll(Integer page);
+    PageCommentResponse findAllByBook(Integer page,String name);
 
     CommentEntity getComment(int id);
-    CommentEntity addComment(String bookTittle,CommentDTO commentDTO);
-    CommentEntity updateComment(int id,CommentDTO commentDTO);
+    CommentResponse addComment(CommentRequest commentRequest);
     void deleteComment(int id);
 }

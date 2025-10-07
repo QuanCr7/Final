@@ -1,19 +1,25 @@
 package com.example.website.service.impl;
 
-import com.example.website.dto.CommentDTO;
+import com.example.website.configuration.CustomUserDetails;
 import com.example.website.entity.BookEntity;
 import com.example.website.entity.CommentEntity;
 import com.example.website.entity.UserEntity;
 import com.example.website.repository.BookRepository;
 import com.example.website.repository.CommentRepository;
 import com.example.website.repository.UserRepository;
+import com.example.website.request.CommentRequest;
+import com.example.website.response.CommentResponse;
+import com.example.website.response.PageCommentResponse;
 import com.example.website.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -23,17 +29,44 @@ public class CommentServiceImpl implements CommentService {
     private final BookRepository bookRepository;
     private final UserRepository userRepository;
 
+    private static final int size = 10;
+
     @Override
-    public List<CommentEntity> findAll() {
-        return commentRepository.findAll();
+    public PageCommentResponse findAll(Integer page) {
+        int pageNumber = (page == null) ? 0 : page - 1;
+        Pageable pageable = PageRequest.of(pageNumber, size);
+
+        Page<CommentEntity> entityPage = commentRepository.findAll(pageable);
+        Page<CommentResponse> responsePage = entityPage.map(this::response);
+
+        return PageCommentResponse.builder()
+                .currentPage(pageNumber + 1)
+                .pageSize(responsePage.getSize())
+                .totalPages(responsePage.getTotalPages())
+                .totalElements(responsePage.getTotalElements())
+                .comments(responsePage.getContent())
+                .build();
     }
 
     @Override
-    public List<CommentEntity> findAllByBook(String name) {
+    public PageCommentResponse findAllByBook(Integer page,String name) {
         String nameBook = getString(name);
+        BookEntity book = bookRepository.findByTitle(nameBook)
+                .orElseThrow(() -> new RuntimeException("Book not found with title: " + nameBook));
 
-        BookEntity book = bookRepository.findByTitle(nameBook).orElseThrow(()-> new RuntimeException("Book not found"));
-        return commentRepository.findAllByBook(book);
+        int pageNumber = (page == null) ? 0 : page - 1;
+        Pageable pageable = PageRequest.of(pageNumber, size);
+
+        Page<CommentEntity> entityPage = commentRepository.findAllByBook(book, pageable);
+        Page<CommentResponse> responsePage = entityPage.map(this::response);
+
+        return PageCommentResponse.builder()
+                .currentPage(pageNumber + 1)
+                .pageSize(responsePage.getSize())
+                .totalPages(responsePage.getTotalPages())
+                .totalElements(responsePage.getTotalElements())
+                .comments(responsePage.getContent())
+                .build();
     }
 
     @Override
@@ -42,24 +75,27 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public CommentEntity addComment(String bookTittle,CommentDTO commentDTO) {
-        String nameBook = getString(bookTittle);
-        BookEntity book = bookRepository.findByTitle(nameBook).orElseThrow(()-> new RuntimeException("Book not found"));
-        UserEntity user = userRepository.findById(commentDTO.getUserId()).orElseThrow(()-> new RuntimeException("User not found"));
-        CommentEntity commentEntity = CommentEntity.builder()
-                .comment(commentDTO.getComment())
+    public CommentResponse addComment(CommentRequest commentRequest) {
+
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Integer userId = userDetails.getId();
+        if (userId == null) {
+            throw new RuntimeException("User not authenticated");
+        }
+
+        BookEntity book = bookRepository.findById(commentRequest.getBookId())
+                .orElseThrow(() -> new RuntimeException("Book not found with id: " + commentRequest.getBookId()));
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+
+        CommentEntity comment = CommentEntity.builder()
+                .comment(commentRequest.getComment())
+                .createAt(LocalDate.now())
                 .book(book)
                 .user(user)
-                .createAt(LocalDate.now())
                 .build();
-        return commentRepository.save(commentEntity);
-    }
 
-    @Override
-    public CommentEntity updateComment(int id, CommentDTO commentDTO) {
-        CommentEntity commentEntity = getComment(id);
-        commentEntity.setComment(commentDTO.getComment());
-        return commentRepository.save(commentEntity);
+        return response(commentRepository.save(comment));
     }
 
     @Override
@@ -67,8 +103,16 @@ public class CommentServiceImpl implements CommentService {
         commentRepository.deleteById(id);
     }
 
+    public CommentResponse response(CommentEntity response) {
+        return CommentResponse.builder()
+                .commentId(response.getId())
+                .comment(response.getComment())
+                .bookId(response.getBook().getId())
+                .userId(response.getUser().getId())
+                .build();
+    }
+
     private static String getString(String name) {
-        String formatted = name.replace("-", " ");
-        return formatted;
+        return name.replace("-", " ");
     }
 }

@@ -1,15 +1,15 @@
 package com.example.website.controller.API;
 
-import com.example.website.dto.CommentDTO;
 import com.example.website.entity.CommentEntity;
+import com.example.website.request.CommentRequest;
 import com.example.website.response.BaseResponse;
+import com.example.website.response.CommentResponse;
+import com.example.website.response.PageCommentResponse;
 import com.example.website.service.impl.CommentServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
@@ -23,8 +23,21 @@ public class CommentController extends BaseController {
             tags = {"Bình luận"}
     )
     @GetMapping("")
-    public ResponseEntity<BaseResponse<List<CommentEntity>>> index() {
-        return returnSuccess(commentServiceImpl.findAll());
+    public ResponseEntity<BaseResponse<PageCommentResponse>> index(
+            @RequestParam(defaultValue = "1") int page) {
+        return returnSuccess(commentServiceImpl.findAll(page));
+    }
+
+    @Operation(
+            summary = "Lấy bình luận theo sách",
+            description = "Trả về tất cả bình luận của một cuốn sách cụ thể",
+            tags = {"Bình luận"}
+    )
+    @GetMapping("/book/{bookTitle}")
+    public ResponseEntity<BaseResponse<PageCommentResponse>> getCommentByBook(
+            @RequestParam(defaultValue = "1") int page,
+            @PathVariable("bookTitle") String bookTitle) {
+        return returnSuccess(commentServiceImpl.findAllByBook(page,bookTitle));
     }
 
     @Operation(
@@ -38,26 +51,14 @@ public class CommentController extends BaseController {
     }
 
     @Operation(
-            summary = "Lấy bình luận theo sách",
-            description = "Trả về tất cả bình luận của một cuốn sách cụ thể",
-            tags = {"Bình luận"}
-    )
-    @GetMapping("/book/{bookTitle}")
-    public ResponseEntity<BaseResponse<List<CommentEntity>>> getCommentByBook(
-            @PathVariable("bookTitle") String bookTitle) {
-        return returnSuccess(commentServiceImpl.findAllByBook(bookTitle));
-    }
-
-    @Operation(
             summary = "Thêm bình luận mới",
             description = "Thêm bình luận mới cho một cuốn sách",
             tags = {"Bình luận"}
     )
-    @PostMapping("/{bookTitle}")
-    public ResponseEntity<BaseResponse<CommentEntity>> addComment(
-            @PathVariable("bookTitle") String bookTitle,
-            @RequestBody CommentDTO commentDTO) {
-        return returnSuccess(commentServiceImpl.addComment(bookTitle, commentDTO));
+    @PostMapping("")
+    public ResponseEntity<BaseResponse<CommentResponse>> addComment(
+            @RequestBody CommentRequest commentRequest) {
+        return returnSuccess(commentServiceImpl.addComment(commentRequest));
     }
 
     @Operation(
