@@ -1,10 +1,11 @@
 package com.example.website.service.impl;
 
-import com.example.website.dto.BookDTO;
+import com.example.website.request.BookRequest;
 import com.example.website.entity.BookEntity;
 import com.example.website.entity.CategoryEntity;
 import com.example.website.repository.BookRepository;
 import com.example.website.repository.CategoryRepository;
+import com.example.website.response.BookResponse;
 import com.example.website.response.PageBookResponse;
 import com.example.website.service.BookService;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,7 @@ public class BookServiceImpl implements BookService {
 
     private final BookRepository bookRepository;
     private final CategoryRepository categoryRepository;
+    private final CategoryServiceImpl categoryService;
 
     private final Path rootLocation = Paths.get("src/main/resources/static/images/book");
 
@@ -42,83 +44,85 @@ public class BookServiceImpl implements BookService {
         Pageable pageable = PageRequest.of(pageNumber, size);
 
         Page<BookEntity> entityPage = bookRepository.findAll(pageable);
+        Page<BookResponse> responsePage = entityPage.map(this::response);
 
         return PageBookResponse.builder()
                 .currentPage(pageNumber + 1)
                 .pageSize(entityPage.getSize())
                 .totalPages(entityPage.getTotalPages())
                 .totalElements(entityPage.getTotalElements())
-                .books(entityPage.getContent())
+                .books(responsePage.getContent())
                 .build();
     }
 
     @Override
-    public BookEntity getBook(int id) {
-        return bookRepository.findById(id).orElseThrow(()-> new RuntimeException("Book Not Found"));
+    public BookResponse getBook(int id) {
+        return response(bookRepository.findById(id).orElseThrow(()-> new RuntimeException("Book Not Found")));
     }
 
     @Override
-    public BookEntity createBook(BookDTO bookDTO) {
-        if (bookRepository.existsByTitle(bookDTO.getTitle())) {
+    public BookResponse createBook(BookRequest bookRequest) {
+        if (bookRepository.existsByTitle(bookRequest.getTitle())) {
             throw new RuntimeException("Title Already Exists");
         }
 
-        List<String> imageUrls = saveImages(bookDTO.getImages());
+        List<String> imageUrls = saveImages(bookRequest.getImages());
 
         BookEntity book = BookEntity.builder()
-                .title(bookDTO.getTitle())
-                .author(bookDTO.getAuthor())
-                .price(bookDTO.getPrice())
-                .description(bookDTO.getDescription())
+                .title(bookRequest.getTitle())
+                .author(bookRequest.getAuthor())
+                .price(bookRequest.getPrice())
+                .description(bookRequest.getDescription())
                 .post_date(LocalDate.now())
-                .publisher(bookDTO.getPublisher())
+                .publisher(bookRequest.getPublisher())
                 .images(imageUrls)
                 .categories(new HashSet<>())
                 .build();
 
 
-        if (bookDTO.getCategories() != null) {
-            for (Integer categoryId : bookDTO.getCategories()) {
+        if (bookRequest.getCategories() != null) {
+            for (Integer categoryId : bookRequest.getCategories()) {
                 CategoryEntity category = categoryRepository.findById(categoryId)
                         .orElseThrow(() -> new RuntimeException("Category not found with id: " + categoryId));
                 book.getCategories().add(category);
                 category.getBooks().add(book);
             }
         }
-        return bookRepository.save(book);
+        return response(bookRepository.save(book));
     }
 
     @Override
-    public BookEntity updateBook(int id, BookDTO bookDTO) {
+    public BookResponse updateBook(int id, BookRequest bookRequest) {
 
-        BookEntity book = getBook(id);
-        List<String> imageUrls = (bookDTO.getImages() != null)
-                ? saveImages(bookDTO.getImages())
+        BookEntity book = bookRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Book Not Found"));
+        List<String> imageUrls = (bookRequest.getImages() != null)
+                ? saveImages(bookRequest.getImages())
                 : new ArrayList<>();
-        book.setTitle(bookDTO.getTitle());
-        book.setAuthor(bookDTO.getAuthor());
-        book.setPrice(bookDTO.getPrice());
-        book.setDescription(bookDTO.getDescription());
-        book.setPublisher(bookDTO.getPublisher());
+        book.setTitle(bookRequest.getTitle());
+        book.setAuthor(bookRequest.getAuthor());
+        book.setPrice(bookRequest.getPrice());
+        book.setDescription(bookRequest.getDescription());
+        book.setPublisher(bookRequest.getPublisher());
 
         if (!imageUrls.isEmpty()) {
             book.setImages(imageUrls);
         }
 
-        if (bookDTO.getCategories() != null) {
+        if (bookRequest.getCategories() != null) {
             for (CategoryEntity existingCategory : new HashSet<>(book.getCategories())) {
                 existingCategory.getBooks().remove(book);
             }
             book.getCategories().clear();
 
-            for (Integer categoryId : bookDTO.getCategories()) {
+            for (Integer categoryId : bookRequest.getCategories()) {
                 CategoryEntity category = categoryRepository.findById(categoryId)
                         .orElseThrow(() -> new RuntimeException("Category not found with id: " + categoryId));
                 book.getCategories().add(category);
                 category.getBooks().add(book);
             }
         }
-        return bookRepository.save(book);
+        return response(bookRepository.save(book));
     }
 
     @Override
@@ -143,47 +147,30 @@ public class BookServiceImpl implements BookService {
                 (long) categoryIds.size() : null;
 
         Page<BookEntity> entityPage = bookRepository.searchByCondition(pageable,title,author, (categoryIds != null && !categoryIds.isEmpty()) ? categoryIds : null, categoryCount);
+        Page<BookResponse> responsePage = entityPage.map(this::response);
 
         return PageBookResponse.builder()
                 .currentPage(pageNumber + 1)
                 .pageSize(entityPage.getSize())
                 .totalPages(entityPage.getTotalPages())
                 .totalElements(entityPage.getTotalElements())
-                .books(entityPage.getContent())
+                .books(responsePage.getContent())
                 .build();
     }
 
-//    @Override
-//    public PageBookResponse findByAuthor(Integer page,String author) {
-//        int pageNumber = (page == null) ? 0 : page - 1;
-//        Pageable pageable = PageRequest.of(pageNumber, size);
-//
-//        Page<BookEntity> entityPage = bookRepository.searchByAuthor(pageable, author);
-//
-//        return PageBookResponse.builder()
-//                .currentPage(pageNumber + 1)
-//                .pageSize(entityPage.getSize())
-//                .totalPages(entityPage.getTotalPages())
-//                .totalElements(entityPage.getTotalElements())
-//                .books(entityPage.getContent())
-//                .build();
-//    }
-//
-//    @Override
-//    public PageBookResponse findByTitle(Integer page,String title) {
-//        int pageNumber = (page == null) ? 0 : page - 1;
-//        Pageable pageable = PageRequest.of(pageNumber, size);
-//
-//        Page<BookEntity> entityPage = bookRepository.searchByTitle(pageable, title);
-//
-//        return PageBookResponse.builder()
-//                .currentPage(pageNumber + 1)
-//                .pageSize(entityPage.getSize())
-//                .totalPages(entityPage.getTotalPages())
-//                .totalElements(entityPage.getTotalElements())
-//                .books(entityPage.getContent())
-//                .build();
-//    }
+    public BookResponse response(BookEntity book){
+        return BookResponse.builder()
+                .id(book.getId())
+                .author(book.getAuthor())
+                .title(book.getTitle())
+                .price(book.getPrice())
+                .description(book.getDescription())
+                .post_date(book.getPost_date())
+                .publisher(book.getPublisher())
+                .images(book.getImages())
+                .categories(categoryService.getByBook(book.getId()))
+                .build();
+    }
 
     @Override
     public List<String> saveImages(MultipartFile[] imageFiles) {

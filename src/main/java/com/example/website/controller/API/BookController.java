@@ -1,8 +1,8 @@
 package com.example.website.controller.API;
 
-import com.example.website.dto.BookDTO;
-import com.example.website.entity.BookEntity;
+import com.example.website.request.BookRequest;
 import com.example.website.response.BaseResponse;
+import com.example.website.response.BookResponse;
 import com.example.website.response.PageBookResponse;
 import com.example.website.service.impl.BookServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
@@ -36,7 +36,7 @@ public class BookController extends BaseController {
             tags = {"Sách"}
     )
     @GetMapping("/book/searchId/{id}")
-    public ResponseEntity<BaseResponse<BookEntity>> indexById(@PathVariable("id") int id) {
+    public ResponseEntity<BaseResponse<BookResponse>> indexById(@PathVariable("id") int id) {
         return returnSuccess(bookServiceImpl.getBook(id));
     }
 
@@ -46,8 +46,8 @@ public class BookController extends BaseController {
             tags = {"Sách"}
     )
     @PostMapping(value = "/book/add", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<BaseResponse<BookEntity>> addBook(@ModelAttribute BookDTO bookDTO) {
-        return returnSuccess(bookServiceImpl.createBook(bookDTO));
+    public ResponseEntity<BaseResponse<BookResponse>> addBook(@ModelAttribute BookRequest bookRequest) {
+        return returnSuccess(bookServiceImpl.createBook(bookRequest));
     }
 
     @Operation(
@@ -56,10 +56,10 @@ public class BookController extends BaseController {
             tags = {"Sách"}
     )
     @PutMapping(value = "/book/update/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<BaseResponse<BookEntity>> editBook(
+    public ResponseEntity<BaseResponse<BookResponse>> editBook(
             @PathVariable("id") int id,
-            @ModelAttribute BookDTO bookDTO) {
-        return returnSuccess(bookServiceImpl.updateBook(id, bookDTO));
+            @ModelAttribute BookRequest bookRequest) {
+        return returnSuccess(bookServiceImpl.updateBook(id, bookRequest));
     }
 
     @Operation(

@@ -23,6 +23,11 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    public List<CategoryEntity> getByBook(int bookId) {
+        return categoryRepository.findAllByBookId(bookId);
+    }
+
+    @Override
     public CategoryEntity getCategory(int id) {
         return categoryRepository.findById(id).orElseThrow(()-> new RuntimeException("Category Not Found"));
     }

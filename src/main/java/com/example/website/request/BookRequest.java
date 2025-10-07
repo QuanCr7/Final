@@ -1,4 +1,4 @@
-package com.example.website.dto;
+package com.example.website.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,7 +14,7 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class BookDTO {
+public class BookRequest {
     private String title;
     private String author;
     private BigDecimal price;

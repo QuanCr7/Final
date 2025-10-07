@@ -7,6 +7,7 @@ import java.util.List;
 
 public interface CategoryService {
     List<CategoryEntity> findAll();
+    List<CategoryEntity> getByBook(int bookId);
 
     CategoryEntity getCategory(int id);
     CategoryEntity addCategory(CategoryDTO categoryDTO);
