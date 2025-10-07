@@ -15,41 +15,21 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class Admin {
 
     private final UserServiceImpl userService;
-    private final BookServiceImpl bookService;
 
     @GetMapping("/detail-user")
     public String getUserDetail(@RequestParam int id, Model model) {
-        try {
-            UserResponse userResponse = userService.getUser(id);
-            model.addAttribute("user", userResponse);
-            return "admin/account-detail"; // Trả về template cho trang chi tiết tài khoản
-        } catch (Exception e) {
-            model.addAttribute("error", "Không tìm thấy người dùng với ID: " + id);
-            return "admin/account-detail"; // Vẫn trả về template nhưng có thông báo lỗi
-        }
+        model.addAttribute("user", id);
+        return "admin/account-detail";
     }
 
     @GetMapping("/book-detail")
     public String getBookDetail(@RequestParam int id, Model model) {
-        try {
-            // Lấy thông tin sách từ service
-            BookEntity book = bookService.getBook(id);
-            model.addAttribute("book", book);
-            return "admin/book-detail"; // Trả về template cho trang chi tiết sách
-        } catch (Exception e) {
-            model.addAttribute("error", "Không tìm thấy sách với ID: " + id);
-            return "admin/book-detail"; // Vẫn trả về template nhưng có thông báo lỗi
-        }
+        model.addAttribute("book", id);
+        return "admin/book-detail";
     }
 
     @GetMapping("/tet")
     public String tet(){
         return "guest/tet";
     }
-
-//    @GetMapping("/book-detail")
-//    public String detail(@RequestParam int id, Model model) {
-//        model.addAttribute("bookId", id);
-//        return "admin/book-detail";
-//    }
 }

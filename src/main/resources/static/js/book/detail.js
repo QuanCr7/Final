@@ -19,18 +19,6 @@ document.addEventListener('DOMContentLoaded', function() {
             showError('Không thể thêm sách vào giỏ hàng: Dữ liệu sách không khả dụng');
         }
     });
-
-    // Xử lý nút sửa
-    document.getElementById('editBtn').addEventListener('click', function() {
-        window.location.href = `/update?id=${bookId}`;
-    });
-
-    // Xử lý nút xóa
-    document.getElementById('deleteBtn').addEventListener('click', function() {
-        if (confirm('Bạn có chắc chắn muốn xóa sách này?')) {
-            deleteBook(bookId);
-        }
-    });
 });
 
 function loadBookDetail(bookId) {
@@ -75,7 +63,7 @@ function renderBookDetail(book) {
     document.getElementById('bookTitle').textContent = book.title;
     document.getElementById('bookAuthor').textContent = book.author;
     document.getElementById('bookPublisher').textContent = book.publisher;
-    document.getElementById('bookPrice').textContent = book.price + "đ";
+    document.getElementById('bookPrice').textContent = book.price.toLocaleString('vi-VN')+ "đ";
     document.getElementById('bookDescription').textContent = book.description || 'Không có mô tả';
 
     // Định dạng ngày
@@ -123,34 +111,6 @@ function renderBookDetail(book) {
     } else {
         mainImage.src = 'https://via.placeholder.com/400x600?text=Không+có+ảnh';
     }
-}
-
-function deleteBook(bookId) {
-    const loadingElement = document.getElementById('loading');
-    const errorElement = document.getElementById('error');
-
-    loadingElement.style.display = 'block';
-    errorElement.style.display = 'none';
-
-    fetch(`/book/delete/${bookId}`, {
-        method: 'DELETE'
-    })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Xóa sách không thành công');
-            }
-            return response.json();
-        })
-        .then(data => {
-            alert('Xóa sách thành công!');
-            window.location.href = '/';
-        })
-        .catch(error => {
-            loadingElement.style.display = 'none';
-            errorElement.textContent = error.message;
-            errorElement.style.display = 'block';
-            console.error('Lỗi khi xóa sách:', error);
-        });
 }
 
 function showError(message) {

@@ -111,19 +111,19 @@ public class OrderServiceImpl implements OrderService {
                 .build();
         order = orderRepository.save(order);
 
-        // Add order details using OrderDetailService
+        // Thêm chi tiết đơn hàng bằng cách sử dụng OrderDetailService
         List<OrderDetailEntity> orderDetails = new ArrayList<>();
         for (OrderDetailRequest detailRequest : orderDetailRequests) {
-            // Update orderId in OrderDetailRequest to match the new order
+            // Cập nhật orderId trong OrderDetailRequest để phù hợp với đơn hàng mới
             OrderDetailRequest updatedDetailRequest = OrderDetailRequest.builder()
                     .orderId(order.getId())
                     .bookId(detailRequest.getBookId())
                     .quantity(detailRequest.getQuantity())
                     .price(detailRequest.getPrice())
                     .build();
-            // Call add method from OrderDetailService
+            // Gọi phương thức add từ OrderDetailService
             List<OrderDetailResponse> detailResponses = orderDetailService.add(updatedDetailRequest);
-            // Convert responses back to entities for setting in OrderEntity
+            // Chuyển đổi phản hồi trở lại thành các thực thể để thiết lập trong OrderEntity
             OrderDetailEntity detailEntity = orderDetailRepository.findById(detailResponses.getFirst().getId())
                     .orElseThrow(() -> new RuntimeException("Failed to retrieve added order detail"));
             orderDetails.add(detailEntity);

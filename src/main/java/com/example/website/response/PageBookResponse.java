@@ -15,5 +15,5 @@ public class PageBookResponse {
     private int pageSize;
     private long totalElements;
     private int totalPages;
-    private List<BookEntity> books;
+    private List<BookResponse> books;
 }
